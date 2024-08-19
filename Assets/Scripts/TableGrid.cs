@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
-public class TableGrid : MonoBehaviour
+public class TableGrid : MonoBehaviour, ISaveable
 {
     public event Action<GridCell> OnBuildingPlaced;
     public event Action<GridCell> OnBuildingRemoved;
@@ -70,11 +72,25 @@ public class TableGrid : MonoBehaviour
             Destroy(buildingPrefab);
         }
 
-        if (!selectedHotBarButton.BuildingPrefab) return;
+        if (!selectedHotBarButton.BuildingPrefab)
+        {
+            buildingPrefab = null;
+            return;
+        }
+
+        ;
 
         buildingPrefab = Instantiate(selectedHotBarButton.BuildingPrefab, gridLayerContainer);
-        buildingPrefab.transform.position = new Vector3(0, 0, 0);
+        var yPos = selectedHotBarButton.BuildingPrefab.transform.position.y;
+        buildingPrefab.transform.position = new Vector3(0, yPos, 0);
         buildingPrefab.transform.rotation = Quaternion.Euler(0, currentRotation, 0);
+    }
+
+    private void PlaceBuildingFromHotBar(Vector3 position)
+    {
+        var selectedHotBarButton = HotBar.Instance.SelectedHotBarButton;
+        var yPos = selectedHotBarButton.BuildingPrefab.transform.position.y;
+        PlaceBuilding(position, selectedHotBarButton.BuildingPrefab, selectedHotBarButton.BuildingSize, yPos);
     }
 
     // Update is called once per frame
@@ -89,10 +105,14 @@ public class TableGrid : MonoBehaviour
             }
         }
 
-        if (!HotBar.Instance.SelectedHotBarButton) return;
+        var selectedHotBarButton = HotBar.Instance.SelectedHotBarButton;
+
+        if (!selectedHotBarButton) return;
 
         var ray = _camera.ScreenPointToRay(Mouse.current.position.ReadValue());
-        if (!Physics.Raycast(ray, out var hit, Mathf.Infinity, activeLayerMask) || !hit.collider.CompareTag("Grid"))
+        if (!Physics.Raycast(ray, out var hit, Mathf.Infinity, activeLayerMask) ||
+            !hit.collider.CompareTag("Grid") ||
+            EventSystem.current.IsPointerOverGameObject()) // Check if the mouse is over a UI element.
         {
             if (buildingPrefab && buildingPrefab.gameObject.activeSelf)
             {
@@ -104,9 +124,9 @@ public class TableGrid : MonoBehaviour
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            if (HotBar.Instance.SelectedHotBarButton.BuildingPrefab)
+            if (selectedHotBarButton.BuildingPrefab)
             {
-                PlaceBuilding(hit.point);
+                PlaceBuildingFromHotBar(hit.point);
             }
             else
             {
@@ -116,7 +136,8 @@ public class TableGrid : MonoBehaviour
 
         if (buildingPrefab)
         {
-            RenderPrefab(hit.point);
+            var yPos = selectedHotBarButton.BuildingPrefab.transform.position.y;
+            RenderPrefab(hit.point, yPos);
         }
     }
 
@@ -127,28 +148,33 @@ public class TableGrid : MonoBehaviour
         if (!GriCellsOccupied(testRect)) return;
 
         var gridCell = gridCells.Find(cell => cell.rect.Overlaps(testRect));
-        Destroy(gridCell.building);
+        ClearGridCell(gridCell);
         gridCells.Remove(gridCell);
+    }
+
+    private void ClearGridCell(GridCell gridCell)
+    {
+        Destroy(gridCell.building);
         OnBuildingRemoved?.Invoke(gridCell);
     }
 
-    private void RenderPrefab(Vector3 position)
+    private void RenderPrefab(Vector3 position, float yPos)
     {
         if (!buildingPrefab.gameObject.activeSelf)
         {
             buildingPrefab.gameObject.SetActive(true);
         }
 
-        SetBuildingTransform(buildingPrefab, position);
+        SetBuildingTransform(buildingPrefab, position, yPos);
     }
 
-    private void SetBuildingTransform(GameObject building, Vector3 position)
+    private void SetBuildingTransform(GameObject building, Vector3 position, float yPos)
     {
         var gridCoord = GridPosToGridCoord(WorldToGridPos(position));
         var gridPos = GridCoordToGridCoordPos(gridCoord);
-        var selectedHotBarButton = HotBar.Instance.SelectedHotBarButton;
-        gridPos.y = selectedHotBarButton.BuildingPrefab.transform.position.y;
-        building.transform.localPosition = gridPos; // Local position used to render relative to the grid layer container.
+        gridPos.y = yPos;
+        building.transform.localPosition =
+            gridPos; // Local position used to render relative to the grid layer container.
         building.transform.rotation = Quaternion.Euler(0, currentRotation, 0);
     }
 
@@ -157,25 +183,23 @@ public class TableGrid : MonoBehaviour
         return gridCells.Exists(cell => cell.rect.Overlaps(buildingRect));
     }
 
-    private void PlaceBuilding(Vector3 position)
+    private void PlaceBuilding(Vector3 position, GameObject prefab, Vector2 size, float yPos)
     {
-        var selectedHotBarButton = HotBar.Instance.SelectedHotBarButton;
-
         var buildingRect = new Rect
         {
             position = GridPosToGridCoord(WorldToGridPos(position)),
-            size = selectedHotBarButton.BuildingSize
+            size = size
         };
         if (GriCellsOccupied(buildingRect)) return;
 
-        var instance = Instantiate(selectedHotBarButton.BuildingPrefab, gridLayerContainer);
+        var instance = Instantiate(prefab, gridLayerContainer);
         var gridCell = new GridCell
         {
             building = instance,
             rect = buildingRect,
         };
         gridCells.Add(gridCell);
-        SetBuildingTransform(instance, position);
+        SetBuildingTransform(instance, position, yPos);
         OnBuildingPlaced?.Invoke(gridCell);
     }
 
@@ -195,6 +219,41 @@ public class TableGrid : MonoBehaviour
     // Convert the grid coordinates to grid local position, within the grid layer container.
     private Vector3 GridCoordToGridCoordPos(Vector2 gridCoord)
     {
-        return new Vector3(gridCoord.x + 0.5f, 0, gridCoord.y + + 0.5f); // Ignore the y-axis.
+        return new Vector3(gridCoord.x + 0.5f, 0, gridCoord.y + +0.5f); // Ignore the y-axis.
+    }
+
+    public void PopulateSaveData(SaveData saveData)
+    {
+        foreach (var gridCellSaveData in gridCells.Select(gridCell => new GridSaveData.GridCellSaveData()
+                 {
+                     position = new Vector2Int((int)gridCell.rect.position.x, (int)gridCell.rect.position.y),
+                     size = new Vector2Int((int)gridCell.rect.size.x, (int)gridCell.rect.size.y),
+                     trackScriptableObject = gridCell.building.GetComponent<TrainTrack>().TrackScriptableObject,
+                     yRotation = gridCell.building.transform.eulerAngles.y
+                 }))
+        {
+            saveData.GridSave.gridCells.Add(gridCellSaveData);
+        }
+    }
+
+    public void LoadFromSaveData(SaveData saveData)
+    {
+        foreach (var gridCell in gridCells)
+        {
+            ClearGridCell(gridCell);
+        }
+
+        gridCells.Clear();
+        foreach (var gridCellSaveData in saveData.GridSave.gridCells)
+        {
+            var prefab = gridCellSaveData.trackScriptableObject?.TrackPrefab ??
+                         gridCellSaveData.buildingScriptableObject?.BuildingPrefab;
+            if (!prefab) continue;
+
+            var position = new Vector3(gridCellSaveData.position.x, 0, gridCellSaveData.position.y);
+            var size = new Vector2(gridCellSaveData.size.x, gridCellSaveData.size.y);
+            currentRotation = gridCellSaveData.yRotation;
+            PlaceBuilding(position, prefab, size, prefab.transform.position.y);
+        }
     }
 }
