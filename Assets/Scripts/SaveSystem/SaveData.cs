@@ -19,9 +19,18 @@ public struct GridSaveData
 }
 
 [Serializable]
+public struct TrainSaveData
+{
+    public Vector3 position;
+    public float yRotation;
+    public float speed;
+}
+
+[Serializable]
 public class SaveData
 {
     public GridSaveData GridSave = new() { gridCells = new List<GridSaveData.GridCellSaveData>() };
+    public List<TrainSaveData> TrainListSave = new();
 
     public string ToJson()
     {

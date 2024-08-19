@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class TrainEngine : MonoBehaviour
@@ -7,7 +6,6 @@ public class TrainEngine : MonoBehaviour
     private class PathNode
     {
         public Vector3 Position;
-        public float StartingRotationAngle;
     }
 
     [SerializeField] private float speed = 1;
@@ -17,26 +15,20 @@ public class TrainEngine : MonoBehaviour
     private PathNode currentTarget;
     public bool IsMoving => currentPath.Count > 0;
 
-    public void SetPath(List<Transform> path, float startingRotationAngle)
+    public float Speed
     {
-        var startingPosition = transform.position;
-        if (currentTarget != null)
-        {
-            startingPosition = currentTarget.Position;
-        }
+        get => speed;
+        set => speed = value;
+    }
 
-        /*if (Vector3.Distance(path.First().position, startingPosition) >
-            Vector3.Distance(path.Last().position, startingPosition) && currentPath.Count > 0)
-        {
-            startingRotationAngle = currentPath.Last().StartingRotationAngle - startingRotationAngle;
-        }*/
+    public void SetPath(List<Transform> path)
+    {
 
         foreach (var node in path)
         {
             currentPath.Enqueue(new PathNode
             {
                 Position = new Vector3(node.position.x, transform.position.y, node.position.z),
-                StartingRotationAngle = startingRotationAngle,
             });
         }
 
@@ -74,7 +66,7 @@ public class TrainEngine : MonoBehaviour
 
         if (currentTarget == null) return;
 
-        var distanceTravelled = speed * Time.deltaTime;
+        var distanceTravelled = Speed * Time.deltaTime;
         distanceToTarget -= distanceTravelled;
         transform.position += distanceTravelled * transform.forward;
     }

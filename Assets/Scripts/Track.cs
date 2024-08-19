@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Track : MonoBehaviour
+public class Track : MonoBehaviour, ISaveable
 {
     [SerializeField] private List<TrainTrack> trainTracks;
     [SerializeField] private List<TrainEngine> trainEngines;
+    [SerializeField] private TrainEngine trainEnginesPrefab;
     [SerializeField] private TableGrid tableGrid;
-    [SerializeField] private float trainSpeed = 1;
-
     private void OnEnable()
     {
         tableGrid.OnBuildingPlaced += OnBuildingPlaced;
@@ -80,14 +78,41 @@ public class Track : MonoBehaviour
                     ? 1
                     : -1
             );
+            
+            engine.SetPath(path);
+        }
+    }
 
-            var startingRotationAngle = nextTrack.TrackScriptableObject.TrackType switch
-            {
-                TrackType.Straight =>  nextTrack.transform.eulerAngles.y,
-                TrackType.Curve =>  nextTrack.transform.eulerAngles.y + 45f,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-            engine.SetPath(path, startingRotationAngle);
+    public void PopulateSaveData(SaveData saveData)
+    {
+        foreach (var trainSaveData in trainEngines.Select(trainEngine => new TrainSaveData
+                 {
+                     position = trainEngine.transform.position,
+                     yRotation = trainEngine.transform.eulerAngles.y,
+                     speed = trainEngine.Speed
+                 }))
+        {
+            saveData.TrainListSave.Add(trainSaveData);
+        }
+    }
+
+    public void LoadFromSaveData(SaveData saveData)
+    {
+        foreach (var trainEngine in trainEngines)
+        {
+            Destroy(trainEngine.gameObject);
+        }
+
+        trainEngines.Clear();
+        foreach (var trainSaveData in saveData.TrainListSave)
+        {
+            var trainEngine = Instantiate(trainEnginesPrefab, transform);
+            trainEngines.Add(trainEngine);
+
+            trainEngine.transform.position = trainSaveData.position;
+            trainEngine.transform.eulerAngles = new Vector3(0, trainSaveData.yRotation, 0);
+            trainEngine.Speed = trainSaveData.speed;
+            trainEngine.gameObject.SetActive(true);
         }
     }
 }
