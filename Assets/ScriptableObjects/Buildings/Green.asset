@@ -16,3 +16,4 @@ MonoBehaviour:
     type: 3}
   buildingSize: {x: 1, y: 1}
   sprite: {fileID: 0}
+  popularity: 2
