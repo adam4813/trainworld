@@ -31,10 +31,7 @@ public class PopularityManager : MonoBehaviour
         if (!gridCell.building.TryGetComponent<Building>(out var building)) return;
 
         var buildingScriptableObject = building.BuildingScriptableObject;
-
-        popularity += buildingScriptableObject.Popularity;
-
-        PopularityChanged?.Invoke(popularity);
+        SetPopularity(popularity + buildingScriptableObject.Popularity);
     }
 
     private void OnBuildingRemoved(TableGrid.GridCell gridCell)
@@ -42,7 +39,12 @@ public class PopularityManager : MonoBehaviour
         if (!gridCell.building.TryGetComponent<Building>(out var building)) return;
 
         var buildingScriptableObject = building.BuildingScriptableObject;
+        SetPopularity(popularity - buildingScriptableObject.Popularity);
+    }
 
-        popularity -= buildingScriptableObject.Popularity;
+    private void SetPopularity(int value)
+    {
+        popularity = value;
+        PopularityChanged?.Invoke(popularity);
     }
 }
