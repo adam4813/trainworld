@@ -10,7 +10,6 @@ public class HotBarButton : MonoBehaviour
     public BuildingScriptableObject buildingScriptableObject;
     public TrackScriptableObject trackScriptableObject;
 
-    private bool isSelected;
     public Vector2 BuildingSize =>
         (buildingScriptableObject ? buildingScriptableObject.BuildingSize : trackScriptableObject?.TrackSize) ?? new Vector2();
     public GameObject BuildingPrefab => buildingScriptableObject ? buildingScriptableObject.BuildingPrefab : trackScriptableObject?.TrackPrefab;
@@ -22,13 +21,11 @@ public class HotBarButton : MonoBehaviour
     
     public void Select()
     {
-        isSelected = true;
         GetComponent<Image>().color = Color.green;
     }
     
     public void Deselect()
     {
-        isSelected = false;
         GetComponent<Image>().color = Color.white;
     }
 }
