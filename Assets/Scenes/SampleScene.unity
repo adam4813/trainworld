@@ -4830,6 +4830,12 @@ PrefabInstance:
       propertyPath: buildingSize.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 924747737491885053, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
+      propertyPath: buildingScriptableObject
+      value: 
+      objectReference: {fileID: 11400000, guid: 68b446e6c3c184748bf52e89ff3e0841,
+        type: 2}
     - target: {fileID: 1746785914136347112, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
       propertyPath: m_Name
@@ -4968,7 +4974,7 @@ PrefabInstance:
     - target: {fileID: 3837774798714899299, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
       propertyPath: m_text
-      value: 'Black
+      value: 'Brown
 
 '
       objectReference: {fileID: 0}
@@ -5204,6 +5210,7 @@ MonoBehaviour:
   trainEngines:
   - {fileID: 1451850449}
   - {fileID: 628612937}
+  trainEngineContainer: {fileID: 486660381}
   trainEnginesPrefab: {fileID: 9007747689508055930, guid: a9e951ea593fb8a4cb0902a8b1d81033,
     type: 3}
   tableGrid: {fileID: 1814694446}
@@ -5528,6 +5535,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2042230199}
   - component: {fileID: 2042230198}
+  - component: {fileID: 2042230200}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -5547,7 +5555,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2962e59ce2954564da76c407fba71b67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  saveFileName: SaveData
+  saveFileName: SaveData.json
 --- !u!4 &2042230199
 Transform:
   m_ObjectHideFlags: 0
@@ -5563,6 +5571,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2042230200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2042230197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f3f4552cbc84725b1eb630a6aa3b2f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildings: []
+  tableGrid: {fileID: 1814694446}
 --- !u!4 &2043597151 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8256051566032468850, guid: 4a37fa85f618cce4ca0decc7768a9038,
@@ -6306,6 +6328,12 @@ PrefabInstance:
       propertyPath: buildingSize.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 924747737491885053, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
+      propertyPath: buildingScriptableObject
+      value: 
+      objectReference: {fileID: 11400000, guid: 5575b0b7916b21047b25dd7b1391c452,
+        type: 2}
     - target: {fileID: 1746785914136347112, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
       propertyPath: m_Name

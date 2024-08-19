@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -77,8 +76,6 @@ public class TableGrid : MonoBehaviour, ISaveable
             buildingPrefab = null;
             return;
         }
-
-        ;
 
         buildingPrefab = Instantiate(selectedHotBarButton.BuildingPrefab, gridLayerContainer);
         var yPos = selectedHotBarButton.BuildingPrefab.transform.position.y;
@@ -224,16 +221,6 @@ public class TableGrid : MonoBehaviour, ISaveable
 
     public void PopulateSaveData(SaveData saveData)
     {
-        foreach (var gridCellSaveData in gridCells.Select(gridCell => new GridSaveData.GridCellSaveData()
-                 {
-                     position = new Vector2Int((int)gridCell.rect.position.x, (int)gridCell.rect.position.y),
-                     size = new Vector2Int((int)gridCell.rect.size.x, (int)gridCell.rect.size.y),
-                     trackScriptableObject = gridCell.building.GetComponent<TrainTrack>().TrackScriptableObject,
-                     yRotation = gridCell.building.transform.eulerAngles.y
-                 }))
-        {
-            saveData.GridSave.gridCells.Add(gridCellSaveData);
-        }
     }
 
     public void LoadFromSaveData(SaveData saveData)

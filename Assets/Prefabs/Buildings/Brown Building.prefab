@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6591935391047298263}
   - component: {fileID: 1453105246948941820}
   - component: {fileID: 8128269839073817856}
+  - component: {fileID: 5022815238264628651}
   m_Layer: 6
   m_Name: Brown Building
   m_TagString: Untagged
@@ -105,3 +106,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5022815238264628651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7927807399380532107}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98791c6c781240dab61f3fd5904c9e2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildingScriptableObject: {fileID: 11400000, guid: 68b446e6c3c184748bf52e89ff3e0841,
+    type: 2}
+  rect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0

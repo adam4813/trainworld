@@ -22,7 +22,7 @@ public class SaveSystem : MonoBehaviour
 
     private void Load()
     {
-        if (!FileManager.LoadFromFile("SaveData", out var data)) return;
+        if (!FileManager.LoadFromFile(saveFileName, out var data)) return;
         
         var saveData = new SaveData();
         saveData.LoadFromJson(data);

@@ -2,10 +2,11 @@
 using System.Linq;
 using UnityEngine;
 
-public class Track : MonoBehaviour, ISaveable
+public class TrackManager : MonoBehaviour, ISaveable
 {
     [SerializeField] private List<TrainTrack> trainTracks;
     [SerializeField] private List<TrainEngine> trainEngines;
+    [SerializeField] private Transform trainEngineContainer;
     [SerializeField] private TrainEngine trainEnginesPrefab;
     [SerializeField] private TableGrid tableGrid;
     private void OnEnable()
@@ -94,6 +95,35 @@ public class Track : MonoBehaviour, ISaveable
         {
             saveData.TrainListSave.Add(trainSaveData);
         }
+        foreach (var trainTackSaveData in trainTracks.Select(trainTrack =>
+                 {
+                     var rect = trainTrack.rect;
+                     if (rect.size.x > 1)
+                     {
+                         if (trainTrack.transform.eulerAngles.y is 90 or 180)
+                         {
+                             rect.x += 1;
+                         }
+                     }
+
+                     if (rect.size.y > 1)
+                     {
+                         if (trainTrack.transform.eulerAngles.y < 180)
+                         {
+                             rect.y += 1;
+                         }
+                     }
+                     return new GridSaveData.GridCellSaveData()
+                     {
+                         position = new Vector2Int((int)rect.position.x, (int)rect.position.y),
+                         size = new Vector2Int((int)rect.size.x, (int)rect.size.y),
+                         trackScriptableObject = trainTrack.TrackScriptableObject,
+                         yRotation = trainTrack.transform.eulerAngles.y
+                     };
+                 }))
+        {
+            saveData.GridSave.gridCells.Add(trainTackSaveData);
+        }
     }
 
     public void LoadFromSaveData(SaveData saveData)
@@ -106,7 +136,7 @@ public class Track : MonoBehaviour, ISaveable
         trainEngines.Clear();
         foreach (var trainSaveData in saveData.TrainListSave)
         {
-            var trainEngine = Instantiate(trainEnginesPrefab, transform);
+            var trainEngine = Instantiate(trainEnginesPrefab, trainEngineContainer);
             trainEngines.Add(trainEngine);
 
             trainEngine.transform.position = trainSaveData.position;
