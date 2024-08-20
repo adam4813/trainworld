@@ -6070,6 +6070,12 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 924747737491885053, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
+      propertyPath: sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 021128251002a6545b4270e89aa2949a,
+        type: 3}
+    - target: {fileID: 924747737491885053, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
       propertyPath: buildingPrefab
       value: 
       objectReference: {fileID: 7927807399380532107, guid: 6e62690ae54ba5f4497ac69940042ba6,
@@ -6195,6 +6201,27 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2669084809884808515, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 021128251002a6545b4270e89aa2949a,
+        type: 3}
+    - target: {fileID: 2669084809884808515, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2669084809884808515, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2669084809884808515, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2763882564880307638, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -6228,9 +6255,7 @@ PrefabInstance:
     - target: {fileID: 3837774798714899299, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
       propertyPath: m_text
-      value: 'Brown
-
-'
+      value: R House
       objectReference: {fileID: 0}
     - target: {fileID: 8833005677520997167, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
@@ -7702,6 +7727,12 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 924747737491885053, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
+      propertyPath: sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 382d2eee0e714564ba83ea12d52b155f,
+        type: 3}
+    - target: {fileID: 924747737491885053, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
       propertyPath: buildingPrefab
       value: 
       objectReference: {fileID: 5937541675839786168, guid: 0a1d502bd6a68744a9c5fa9f0b9a9257,
@@ -7827,6 +7858,27 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2669084809884808515, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 382d2eee0e714564ba83ea12d52b155f,
+        type: 3}
+    - target: {fileID: 2669084809884808515, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2669084809884808515, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2669084809884808515, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2763882564880307638, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -7856,6 +7908,13 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3837774798714899299, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
+      propertyPath: m_text
+      value: 'G House
+
+'
       objectReference: {fileID: 0}
     - target: {fileID: 8833005677520997167, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
