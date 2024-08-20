@@ -6,6 +6,8 @@ public class HotBarButton : MonoBehaviour
     [SerializeField] private Sprite sprite;
     [SerializeField] private Image image;
     [SerializeField] private Vector2 buildingSize;
+    
+    private AudioSource audioSource;
 
     public BuildingScriptableObject buildingScriptableObject;
     public TrackScriptableObject trackScriptableObject;
@@ -22,6 +24,8 @@ public class HotBarButton : MonoBehaviour
     private void Awake()
     {
         image.sprite = sprite;
+        audioSource = GetComponent<AudioSource>();
+        GetComponent<Button>().onClick.AddListener(() => audioSource.Play());
     }
 
     public void Select()

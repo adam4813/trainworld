@@ -28,6 +28,7 @@ public class HotBarManager : MonoBehaviour
             hotBars[activeHotBarIndex].gameObject.SetActive(false);
             activeHotBarIndex = -1;
             HotBar.FireHotBarButtonClicked(deleteButton);
+            deleteButton.GetComponent<AudioSource>().Play();
         });
     }
 
@@ -39,6 +40,7 @@ public class HotBarManager : MonoBehaviour
             var child = transform.GetChild(i);
             if (child.GetComponent<HotBarButton>()) continue;
             var button = child.GetComponent<Button>();
+            var audioSource = child.GetComponent<AudioSource>();
             button.onClick.AddListener(() =>
             {
                 if (activeHotBarIndex == index) return;
@@ -46,6 +48,8 @@ public class HotBarManager : MonoBehaviour
                 {
                     hotBars[activeHotBarIndex].gameObject.SetActive(false);
                 }
+
+                audioSource.Play();
 
                 activeHotBarIndex = index;
                 hotBars[activeHotBarIndex].gameObject.SetActive(true);

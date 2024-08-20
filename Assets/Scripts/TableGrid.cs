@@ -22,6 +22,9 @@ public class TableGrid : MonoBehaviour, ISaveable
         public GameObject building;
     }
 
+    [SerializeField] private AudioClip placeBuildingSound;
+    [SerializeField] private AudioClip placeEngineSound;
+    [SerializeField] private AudioClip removeBuildingSound;
     [SerializeField] private Transform gridLayerContainer;
     [SerializeField] private List<GridCell> gridCells;
     [SerializeField] private LayerMask activeLayerMask;
@@ -32,11 +35,13 @@ public class TableGrid : MonoBehaviour, ISaveable
     private GameObject trainEngineDrag;
     private TrainEngine pickedUpTrainEngine;
     private bool isDraggingEngine;
+    private AudioSource audioSource;
 
     // Start is called before the first frame update
     private void Awake()
     {
         _camera = Camera.main;
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -250,6 +255,7 @@ public class TableGrid : MonoBehaviour, ISaveable
 
     private void PlaceEngine(TrainEngine trainEngine, Vector3 position)
     {
+        audioSource.PlayOneShot(placeEngineSound);
         // Check if the engine is being placed on a track.
         var gridCoord = GridPosToGridCoord(WorldToGridPos(position));
         var gridPos = GridCoordToGridCoordPos(gridCoord);
@@ -267,6 +273,7 @@ public class TableGrid : MonoBehaviour, ISaveable
 
     private void ClearBuilding(Vector3 position)
     {
+        audioSource.PlayOneShot(removeBuildingSound);
         var gridCoord = GridPosToGridCoord(WorldToGridPos(position));
         var testRect = new Rect(gridCoord, Vector2.one);
         if (!GriCellsOccupied(testRect)) return;
@@ -309,6 +316,7 @@ public class TableGrid : MonoBehaviour, ISaveable
 
     private void PlaceBuilding(Vector3 position, GameObject prefab, Vector2 size, float yPos)
     {
+        audioSource.PlayOneShot(placeBuildingSound);
         var buildingRect = new Rect
         {
             position = GridPosToGridCoord(WorldToGridPos(position)),
