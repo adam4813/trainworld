@@ -13,6 +13,8 @@ public class TableGrid : MonoBehaviour, ISaveable
     public event Action<TrainEngine, Vector3, float> OnEnginePlaced;
     public event Action<TrainEngine> OnEnginePickedUp;
 
+    public event Action<TrainEngine> OnCancelEnginePickup;
+
     [Serializable]
     public class GridCell
     {
@@ -27,7 +29,7 @@ public class TableGrid : MonoBehaviour, ISaveable
     private float currentRotation;
     private Camera _camera;
     private GameObject buildingPrefab;
-    private TrainEngine trainEngineDrag;
+    private GameObject trainEngineDrag;
     private TrainEngine pickedUpTrainEngine;
     private bool isDraggingEngine;
 
@@ -35,15 +37,11 @@ public class TableGrid : MonoBehaviour, ISaveable
     private void Awake()
     {
         _camera = Camera.main;
-        trainEngineDrag = Instantiate(trainEnginePrefab, transform);
-        trainEngineDrag.gameObject.SetActive(false);
     }
 
     private void Start()
     {
         // Make the engine prefab visual only
-        trainEngineDrag.gameObject.tag = "Untagged";
-        trainEngineDrag.gameObject.layer = 2;
 
         // Loop over all children of the grid layer container and add them to the grid cells list.
         for (var i = 0; i < gridLayerContainer.childCount; i++)
@@ -73,13 +71,44 @@ public class TableGrid : MonoBehaviour, ISaveable
         HotBar.OnHotBarButtonClicked -= OnHotBarButtonClicked;
     }
 
+    private void InstantiatedDragEngine(TrainEngine prefab)
+    {
+        if (trainEngineDrag)
+        {
+            Destroy(trainEngineDrag);
+        }
+
+        isDraggingEngine = true;
+        trainEngineDrag = Instantiate(prefab, transform).gameObject;
+        trainEngineDrag.gameObject.tag = "Untagged";
+        trainEngineDrag.gameObject.layer = 2;
+        trainEngineDrag.gameObject.SetActive(false);
+    }
+
     private void OnHotBarButtonClicked(HotBarButton selectedHotBarButton)
     {
         currentRotation = 0; // Move to reset only when hot bar button is selected.
 
+        if (isDraggingEngine && pickedUpTrainEngine)
+        {
+            OnCancelEnginePickup?.Invoke(pickedUpTrainEngine);
+            pickedUpTrainEngine = null;
+            isDraggingEngine = false;
+            if (trainEngineDrag)
+            {
+                Destroy(trainEngineDrag);
+            }
+        }
+
         if (buildingPrefab)
         {
             Destroy(buildingPrefab);
+        }
+
+        if (selectedHotBarButton.EnginePrefab)
+        {
+            InstantiatedDragEngine(selectedHotBarButton.EnginePrefab);
+            return;
         }
 
         if (!selectedHotBarButton.BuildingPrefab)
@@ -124,7 +153,7 @@ public class TableGrid : MonoBehaviour, ISaveable
                 buildingPrefab.gameObject.SetActive(false);
             }
 
-            if (trainEnginePrefab && trainEnginePrefab.gameObject.activeSelf)
+            if (trainEngineDrag && trainEngineDrag.gameObject.activeSelf)
             {
                 trainEngineDrag.gameObject.SetActive(false);
             }
@@ -138,12 +167,27 @@ public class TableGrid : MonoBehaviour, ISaveable
         {
             if (isDraggingEngine)
             {
-                PlaceEngine();
-                trainEngineDrag.gameObject.SetActive(false);
+                if (pickedUpTrainEngine)
+                {
+                    PlaceEngine(pickedUpTrainEngine, trainEngineDrag.transform.position);
+                    pickedUpTrainEngine = null;
+                }
+                else
+                {
+                    if (selectedHotBarButton?.EnginePrefab)
+                    {
+                        PlaceEngine(Instantiate(selectedHotBarButton.EnginePrefab), hit.point);
+                    }
+                }
             }
             else if (hit.collider.CompareTag("TrainEngine"))
             {
-                isDraggingEngine = true;
+                if (buildingPrefab)
+                {
+                    Destroy(buildingPrefab);
+                }
+
+                InstantiatedDragEngine(trainEnginePrefab);
                 pickedUpTrainEngine = hit.collider.GetComponent<TrainEngine>();
                 OnEnginePickedUp?.Invoke(pickedUpTrainEngine);
             }
@@ -198,22 +242,21 @@ public class TableGrid : MonoBehaviour, ISaveable
         }
     }
 
-    private void PlaceEngine()
+    private void PlaceEngine(TrainEngine trainEngine, Vector3 position)
     {
         // Check if the engine is being placed on a track.
-        var gridCoord = GridPosToGridCoord(WorldToGridPos(trainEngineDrag.transform.position));
+        var gridCoord = GridPosToGridCoord(WorldToGridPos(position));
         var gridPos = GridCoordToGridCoordPos(gridCoord);
         var gridCell = gridCells.FirstOrDefault(gridCell => gridCell.rect.Contains(gridCoord));
         if (gridCell == null) return;
         var trainTrack = gridCell.building.GetComponent<TrainTrack>();
         if (!trainTrack) return;
 
-        trainEngineDrag.gameObject.SetActive(false);
         isDraggingEngine = false;
+        Destroy(trainEngineDrag);
         var yRotation = gridCell.building.transform.eulerAngles.y +
                         (trainTrack.TrackScriptableObject.TrackType == TrackType.Curve ? 45 : 0);
-        OnEnginePlaced?.Invoke(pickedUpTrainEngine ? pickedUpTrainEngine : Instantiate(trainEnginePrefab), gridPos,
-            yRotation);
+        OnEnginePlaced?.Invoke(trainEngine, gridPos, yRotation);
     }
 
     private void ClearBuilding(Vector3 position)

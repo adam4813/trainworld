@@ -15,6 +15,7 @@ public class TrackManager : MonoBehaviour, ISaveable
         tableGrid.OnBuildingRemoved += OnBuildingRemoved;
         tableGrid.OnEnginePickedUp += OnTrainEnginePickedUp;
         tableGrid.OnEnginePlaced += OnTrainEnginePlaced;
+        tableGrid.OnCancelEnginePickup += OnCancelTrainEnginePickup;
     }
 
     private void OnDisable()
@@ -23,6 +24,12 @@ public class TrackManager : MonoBehaviour, ISaveable
         tableGrid.OnBuildingRemoved -= OnBuildingRemoved;
         tableGrid.OnEnginePickedUp -= OnTrainEnginePickedUp;
         tableGrid.OnEnginePlaced -= OnTrainEnginePlaced;
+        tableGrid.OnCancelEnginePickup -= OnCancelTrainEnginePickup;
+    }
+
+    private void OnCancelTrainEnginePickup(TrainEngine trainEngine)
+    {
+        trainEngine.gameObject.SetActive(true);
     }
 
     private void OnTrainEnginePickedUp(TrainEngine trainEngine)
