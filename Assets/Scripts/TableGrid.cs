@@ -52,11 +52,21 @@ public class TableGrid : MonoBehaviour, ISaveable
     private void OnEnable()
     {
         HotBar.Instance.OnHotBarButtonClicked += OnHotBarButtonClicked;
+        HotBarMenuOption.OnHotBarMenuOptionClicked += OnHotBarMenuOptionClicked;
     }
 
     private void OnDisable()
     {
         HotBar.Instance.OnHotBarButtonClicked -= OnHotBarButtonClicked;
+        HotBarMenuOption.OnHotBarMenuOptionClicked -= OnHotBarMenuOptionClicked;
+    }
+
+    private void OnHotBarMenuOptionClicked(HotBarMenuOption hotBarMenuOption)
+    {
+        if (hotBarMenuOption.MenuOptionType == MenuOptionType.Build)
+        {
+            
+        }
     }
 
     private void OnHotBarButtonClicked(HotBarButton obj)
