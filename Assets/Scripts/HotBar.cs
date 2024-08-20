@@ -5,29 +5,23 @@ using UnityEngine.UI;
 
 public class HotBar : MonoBehaviour
 {
-    // Add event when hotbar button is clicked
-    public event Action<HotBarButton> OnHotBarButtonClicked;
+    public static event Action<HotBarButton> OnHotBarButtonClicked;
+
     [SerializeField] private List<HotBarButton> hotBarButtons;
     public HotBarButton SelectedHotBarButton { get; private set; }
 
-    public static HotBar Instance { get; private set; }
-
     private void Awake()
     {
-        if (FindObjectsOfType<HotBar>().Length > 1)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
         // Add child game object with compoent HotBarButton to the hotBarButtons list
         foreach (Transform child in transform)
         {
             if (!child.TryGetComponent<HotBarButton>(out var hotBarButton)) continue;
             hotBarButtons.Add(hotBarButton);
         }
+    }
 
+    private void OnEnable()
+    {
         SetSelectedHotBarButton(hotBarButtons[0]);
     }
 
@@ -44,6 +38,11 @@ public class HotBar : MonoBehaviour
         SelectedHotBarButton?.Deselect();
         SelectedHotBarButton = button;
         SelectedHotBarButton.Select();
-        OnHotBarButtonClicked?.Invoke(SelectedHotBarButton);
+        FireHotBarButtonClicked(SelectedHotBarButton);
+    }
+
+    public static void FireHotBarButtonClicked(HotBarButton button)
+    {
+        OnHotBarButtonClicked?.Invoke(button);
     }
 }

@@ -65,29 +65,17 @@ public class TableGrid : MonoBehaviour, ISaveable
 
     private void OnEnable()
     {
-        HotBar.Instance.OnHotBarButtonClicked += OnHotBarButtonClicked;
-        HotBarMenuOption.OnHotBarMenuOptionClicked += OnHotBarMenuOptionClicked;
+        HotBar.OnHotBarButtonClicked += OnHotBarButtonClicked;
     }
 
     private void OnDisable()
     {
-        HotBar.Instance.OnHotBarButtonClicked -= OnHotBarButtonClicked;
-        HotBarMenuOption.OnHotBarMenuOptionClicked -= OnHotBarMenuOptionClicked;
+        HotBar.OnHotBarButtonClicked -= OnHotBarButtonClicked;
     }
 
-    private void OnHotBarMenuOptionClicked(HotBarMenuOption hotBarMenuOption)
-    {
-        if (hotBarMenuOption.MenuOptionType == MenuOptionType.Build)
-        {
-        }
-    }
-
-    private void OnHotBarButtonClicked(HotBarButton obj)
+    private void OnHotBarButtonClicked(HotBarButton selectedHotBarButton)
     {
         currentRotation = 0; // Move to reset only when hot bar button is selected.
-
-        var selectedHotBarButton = HotBar.Instance.SelectedHotBarButton;
-        if (!selectedHotBarButton) return;
 
         if (buildingPrefab)
         {
@@ -108,7 +96,8 @@ public class TableGrid : MonoBehaviour, ISaveable
 
     private void PlaceBuildingFromHotBar(Vector3 position)
     {
-        var selectedHotBarButton = HotBar.Instance.SelectedHotBarButton;
+        var selectedHotBarButton = HotBarManager.Instance.ActiveHotBar?.SelectedHotBarButton;
+        if (!selectedHotBarButton) return;
         var yPos = selectedHotBarButton.BuildingPrefab.transform.position.y;
         PlaceBuilding(position, selectedHotBarButton.BuildingPrefab, selectedHotBarButton.BuildingSize, yPos);
     }
@@ -124,10 +113,6 @@ public class TableGrid : MonoBehaviour, ISaveable
                 currentRotation = 0;
             }
         }
-
-        var selectedHotBarButton = HotBar.Instance.SelectedHotBarButton;
-
-        if (!selectedHotBarButton) return;
 
         var ray = _camera.ScreenPointToRay(Mouse.current.position.ReadValue());
         if (!Physics.Raycast(ray, out var hit, Mathf.Infinity, activeLayerMask) ||
@@ -147,6 +132,8 @@ public class TableGrid : MonoBehaviour, ISaveable
             return;
         }
 
+        var selectedHotBarButton = HotBarManager.Instance.ActiveHotBar?.SelectedHotBarButton;
+
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             if (isDraggingEngine)
@@ -160,7 +147,7 @@ public class TableGrid : MonoBehaviour, ISaveable
                 pickedUpTrainEngine = hit.collider.GetComponent<TrainEngine>();
                 OnEnginePickedUp?.Invoke(pickedUpTrainEngine);
             }
-            else if (selectedHotBarButton.BuildingPrefab)
+            else if (selectedHotBarButton?.BuildingPrefab)
             {
                 PlaceBuildingFromHotBar(hit.point);
             }
@@ -176,7 +163,7 @@ public class TableGrid : MonoBehaviour, ISaveable
             return;
         }
 
-        if (buildingPrefab)
+        if (selectedHotBarButton && buildingPrefab)
         {
             var yPos = selectedHotBarButton.BuildingPrefab.transform.position.y;
             RenderPrefab(hit.point, yPos);
@@ -220,7 +207,7 @@ public class TableGrid : MonoBehaviour, ISaveable
         if (gridCell == null) return;
         var trainTrack = gridCell.building.GetComponent<TrainTrack>();
         if (!trainTrack) return;
-        
+
         trainEngineDrag.gameObject.SetActive(false);
         isDraggingEngine = false;
         var yRotation = gridCell.building.transform.eulerAngles.y +
