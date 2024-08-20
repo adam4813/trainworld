@@ -20,12 +20,13 @@ public class TrainTrack : MonoBehaviour
 
     public List<Transform> GetClosestPath(Vector3 position)
     {
-        var path = paths.FirstOrDefault(path =>
+        /*var path = paths.FirstOrDefault(path =>
             path.nodes.FirstOrDefault(node =>
                 Vector3.Distance(new Vector3(node.position.x, 0, node.position.z),
                     new Vector3(position.x, 0, position.z)) < compareDistance)
         );
-        return path?.nodes ?? new List<Transform>();
+        return path?.nodes ?? new List<Transform>();*/
+        return paths.First().nodes;
     }
 
     private void OnDrawGizmos()
@@ -42,9 +43,15 @@ public class TrainTrack : MonoBehaviour
         foreach (var path in paths)
         {
             Gizmos.color = Color.yellow;
-            Gizmos.DrawSphere(path.nodes[0].position, 0.1f);
+            Gizmos.DrawSphere(path.nodes.First().position, 0.1f);
+            // render other nodes except first and last
+            for (var i = 1; i < path.nodes.Count - 1; i++)
+            {
+                Gizmos.color = new Color(Color.yellow.r, Color.yellow.g , Color.yellow.b, .75f);
+                Gizmos.DrawSphere(path.nodes[i].position, 0.1f);
+            }
             Gizmos.color = Color.green;
-            Gizmos.DrawSphere(path.nodes[1].position, 0.1f);
+            Gizmos.DrawSphere(path.nodes.Last().position, 0.1f);
         }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
 using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 
@@ -26,39 +24,46 @@ public class TrainEngine : MonoBehaviour
 
     public void SetPath(List<Transform> path)
     {
-        path.RemoveAt(0);
+        //path.RemoveAt(0);
         foreach (var node in path)
         {
             var position = new Vector3(node.position.x, transform.position.y, node.position.z);
-            if (Vector3.Dot(transform.forward, position) < 0) continue;
-            if (Vector3.Distance(transform.position, position) < .1f) continue;
-            
             currentPath.Enqueue(new PathNode
             {
                 Position = position,
             });
         }
+
         UpdateCurrentTarget();
+    }
+
+    public Vector3 EngineOffset()
+    {
+        return transform.forward * engineSize / 4f;
     }
 
     private void UpdateCurrentTarget()
     {
         if (distanceToTarget > 0) return;
 
-        var targetOffset = transform.forward * engineSize / 4f;
+        var targetOffset = EngineOffset();
 
         if (currentTarget != null)
         {
             transform.position = currentTarget.Position + targetOffset;
         }
 
-        currentTarget = currentPath.Count > 0 ? currentPath.Dequeue() : null;
+        do
+        {
+            currentTarget = currentPath.Count > 0 ? currentPath.Dequeue() : null;
+        } while (currentTarget != null &&
+                 Vector3.Dot(transform.forward, (currentTarget.Position + targetOffset) - transform.position) < -.75f);
+
         if (currentTarget != null)
         {
             //transform.rotation = Quaternion.Euler(0f, currentTarget.StartingRotationAngle, 0f);
             transform.LookAt(currentTarget.Position + targetOffset);
-            var nextTargetOffset = transform.forward * engineSize / 4f;
-            distanceToTarget = Vector3.Distance(transform.position - nextTargetOffset, currentTarget.Position);
+            distanceToTarget = Vector3.Distance(transform.position - EngineOffset(), currentTarget.Position);
         }
         else
         {
@@ -74,7 +79,10 @@ public class TrainEngine : MonoBehaviour
 
         var distanceTravelled = Speed * Time.deltaTime;
         distanceToTarget -= distanceTravelled;
-        transform.position += Mathf.Clamp(distanceTravelled, 0f, distanceToTarget) * transform.forward;
+        //transform.position += Mathf.Clamp(distanceTravelled, 0f, distanceToTarget) * transform.forward;
+        transform.position = Vector3.MoveTowards(transform.position,
+            currentTarget.Position + EngineOffset(),
+            Mathf.Clamp(distanceTravelled, 0f, distanceToTarget * 2f));
     }
 
     private void OnDrawGizmos()

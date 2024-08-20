@@ -24,6 +24,6 @@ public class HotBarMenuOption : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        menuOptionButton.onClick.AddListener(() => OnHotBarMenuOptionClicked?.Invoke(this));    
+        //menuOptionButton.onClick.AddListener(() => OnHotBarMenuOptionClicked?.Invoke(this));    
     }
 }

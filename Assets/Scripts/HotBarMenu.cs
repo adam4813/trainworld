@@ -8,7 +8,7 @@ public class HotBarMenu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        hotBarMenuButton.onClick.AddListener(() => hotBarMenuPanel.SetActive(!hotBarMenuPanel.activeSelf));
+        //hotBarMenuButton.onClick.AddListener(() => hotBarMenuPanel.SetActive(!hotBarMenuPanel.activeSelf));
     }
 
     private void OnEnable()

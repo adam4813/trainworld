@@ -24,7 +24,8 @@ public class HotBar : MonoBehaviour
         // Add child game object with compoent HotBarButton to the hotBarButtons list
         foreach (Transform child in transform)
         {
-            hotBarButtons.Add(child.GetComponent<HotBarButton>());
+            if (!child.TryGetComponent<HotBarButton>(out var hotBarButton)) continue;
+            hotBarButtons.Add(hotBarButton);
         }
 
         SetSelectedHotBarButton(hotBarButtons[0]);

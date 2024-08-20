@@ -64,7 +64,7 @@ public class TrackManager : MonoBehaviour, ISaveable
             var engineGridCoord = tableGrid.GridPosToGridCoord(enginePosition);
             var currentTrack = trainTracks.FirstOrDefault(trackCell => trackCell.rect.Contains(engineGridCoord));
 
-            var nextEnginePosition = enginePosition + engine.transform.forward;
+            var nextEnginePosition = enginePosition + engine.EngineOffset() * 2f;
             var nextEngineGridCoord = tableGrid.GridPosToGridCoord(nextEnginePosition);
             var nextTrack = trainTracks.FirstOrDefault(trackCell => trackCell.rect.Contains(nextEngineGridCoord));
 
@@ -125,7 +125,7 @@ public class TrackManager : MonoBehaviour, ISaveable
             saveData.GridSave.gridCells.Add(trainTackSaveData);
         }
     }
-
+    
     public void LoadFromSaveData(SaveData saveData)
     {
         foreach (var trainEngine in trainEngines)
@@ -140,7 +140,7 @@ public class TrackManager : MonoBehaviour, ISaveable
             trainEngines.Add(trainEngine);
 
             trainEngine.transform.position = trainSaveData.position;
-            trainEngine.transform.eulerAngles = new Vector3(0, trainSaveData.yRotation, 0);
+            trainEngine.transform.rotation = Quaternion.Euler(0f, trainSaveData.yRotation, 0f);
             trainEngine.Speed = trainSaveData.speed;
             trainEngine.gameObject.SetActive(true);
         }
