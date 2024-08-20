@@ -161,7 +161,7 @@ public class TableGrid : MonoBehaviour, ISaveable
             return;
         }
 
-        var selectedHotBarButton = HotBarManager.Instance.ActiveHotBar?.SelectedHotBarButton;
+        var selectedHotBarButton = HotBarManager.Instance?.ActiveHotBar?.SelectedHotBarButton;
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
