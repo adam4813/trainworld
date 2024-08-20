@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 using UnityEngine;
+using Vector3 = UnityEngine.Vector3;
 
 public class TrainEngine : MonoBehaviour
 {
@@ -23,15 +26,18 @@ public class TrainEngine : MonoBehaviour
 
     public void SetPath(List<Transform> path)
     {
-
+        path.RemoveAt(0);
         foreach (var node in path)
         {
+            var position = new Vector3(node.position.x, transform.position.y, node.position.z);
+            if (Vector3.Dot(transform.forward, position) < 0) continue;
+            if (Vector3.Distance(transform.position, position) < .1f) continue;
+            
             currentPath.Enqueue(new PathNode
             {
-                Position = new Vector3(node.position.x, transform.position.y, node.position.z),
+                Position = position,
             });
         }
-
         UpdateCurrentTarget();
     }
 
@@ -68,7 +74,7 @@ public class TrainEngine : MonoBehaviour
 
         var distanceTravelled = Speed * Time.deltaTime;
         distanceToTarget -= distanceTravelled;
-        transform.position += distanceTravelled * transform.forward;
+        transform.position += Mathf.Clamp(distanceTravelled, 0f, distanceToTarget) * transform.forward;
     }
 
     private void OnDrawGizmos()
