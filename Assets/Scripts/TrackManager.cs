@@ -13,12 +13,38 @@ public class TrackManager : MonoBehaviour, ISaveable
     {
         tableGrid.OnBuildingPlaced += OnBuildingPlaced;
         tableGrid.OnBuildingRemoved += OnBuildingRemoved;
+        tableGrid.OnEnginePickedUp += OnTrainEnginePickedUp;
+        tableGrid.OnEnginePlaced += OnTrainEnginePlaced;
     }
 
     private void OnDisable()
     {
         tableGrid.OnBuildingPlaced -= OnBuildingPlaced;
         tableGrid.OnBuildingRemoved -= OnBuildingRemoved;
+        tableGrid.OnEnginePickedUp -= OnTrainEnginePickedUp;
+        tableGrid.OnEnginePlaced -= OnTrainEnginePlaced;
+    }
+
+    private void OnTrainEnginePickedUp(TrainEngine trainEngine)
+    {
+        trainEngine.gameObject.SetActive(false);
+        trainEngine.ClearPath();
+    }
+
+    private void OnTrainEnginePlaced(TrainEngine trainEngine, Vector3 position, float yRotation)
+    {
+        if (trainEngines.Contains(trainEngine))
+        {
+            trainEngine.gameObject.SetActive(true);
+        }
+        else
+        {
+            trainEngines.Add(trainEngine);
+            trainEngine.transform.parent = trainEngineContainer;
+        }
+
+        trainEngine.transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
+        trainEngine.transform.localPosition = new Vector3(position.x, -1.25f, position.z) + trainEngine.EngineOffset();
     }
 
     private void OnBuildingPlaced(TableGrid.GridCell gridCell)
@@ -58,7 +84,7 @@ public class TrackManager : MonoBehaviour, ISaveable
     {
         foreach (var engine in trainEngines)
         {
-            if (engine.IsMoving) continue;
+            if (engine.IsMoving || !engine.gameObject.activeSelf) continue;
 
             var enginePosition = engine.transform.position;
             var engineGridCoord = tableGrid.GridPosToGridCoord(enginePosition);

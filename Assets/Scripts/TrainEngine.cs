@@ -99,4 +99,11 @@ public class TrainEngine : MonoBehaviour
             Gizmos.DrawSphere(currentTarget.Position, 0.2f);
         }
     }
+
+    public void ClearPath()
+    {
+        distanceToTarget = 0;
+        currentPath.Clear();
+        currentTarget = null;
+    }
 }

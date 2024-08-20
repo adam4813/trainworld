@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -8,6 +9,9 @@ public class TableGrid : MonoBehaviour, ISaveable
 {
     public event Action<GridCell> OnBuildingPlaced;
     public event Action<GridCell> OnBuildingRemoved;
+
+    public event Action<TrainEngine, Vector3, float> OnEnginePlaced;
+    public event Action<TrainEngine> OnEnginePickedUp;
 
     [Serializable]
     public class GridCell
@@ -19,18 +23,28 @@ public class TableGrid : MonoBehaviour, ISaveable
     [SerializeField] private Transform gridLayerContainer;
     [SerializeField] private List<GridCell> gridCells;
     [SerializeField] private LayerMask activeLayerMask;
+    [SerializeField] private TrainEngine trainEnginePrefab;
     private float currentRotation;
     private Camera _camera;
     private GameObject buildingPrefab;
+    private TrainEngine trainEngineDrag;
+    private TrainEngine pickedUpTrainEngine;
+    private bool isDraggingEngine;
 
     // Start is called before the first frame update
     private void Awake()
     {
         _camera = Camera.main;
+        trainEngineDrag = Instantiate(trainEnginePrefab, transform);
+        trainEngineDrag.gameObject.SetActive(false);
     }
 
     private void Start()
     {
+        // Make the engine prefab visual only
+        trainEngineDrag.gameObject.tag = "Untagged";
+        trainEngineDrag.gameObject.layer = 2;
+
         // Loop over all children of the grid layer container and add them to the grid cells list.
         for (var i = 0; i < gridLayerContainer.childCount; i++)
         {
@@ -65,7 +79,6 @@ public class TableGrid : MonoBehaviour, ISaveable
     {
         if (hotBarMenuOption.MenuOptionType == MenuOptionType.Build)
         {
-            
         }
     }
 
@@ -118,7 +131,7 @@ public class TableGrid : MonoBehaviour, ISaveable
 
         var ray = _camera.ScreenPointToRay(Mouse.current.position.ReadValue());
         if (!Physics.Raycast(ray, out var hit, Mathf.Infinity, activeLayerMask) ||
-            !hit.collider.CompareTag("Grid") ||
+            !(hit.collider.CompareTag("Grid") || hit.collider.CompareTag("TrainEngine")) ||
             EventSystem.current.IsPointerOverGameObject()) // Check if the mouse is over a UI element.
         {
             if (buildingPrefab && buildingPrefab.gameObject.activeSelf)
@@ -126,12 +139,28 @@ public class TableGrid : MonoBehaviour, ISaveable
                 buildingPrefab.gameObject.SetActive(false);
             }
 
+            if (trainEnginePrefab && trainEnginePrefab.gameObject.activeSelf)
+            {
+                trainEngineDrag.gameObject.SetActive(false);
+            }
+
             return;
         }
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            if (selectedHotBarButton.BuildingPrefab)
+            if (isDraggingEngine)
+            {
+                PlaceEngine();
+                trainEngineDrag.gameObject.SetActive(false);
+            }
+            else if (hit.collider.CompareTag("TrainEngine"))
+            {
+                isDraggingEngine = true;
+                pickedUpTrainEngine = hit.collider.GetComponent<TrainEngine>();
+                OnEnginePickedUp?.Invoke(pickedUpTrainEngine);
+            }
+            else if (selectedHotBarButton.BuildingPrefab)
             {
                 PlaceBuildingFromHotBar(hit.point);
             }
@@ -141,11 +170,63 @@ public class TableGrid : MonoBehaviour, ISaveable
             }
         }
 
+        if (isDraggingEngine)
+        {
+            RenderEngine(hit.point);
+            return;
+        }
+
         if (buildingPrefab)
         {
             var yPos = selectedHotBarButton.BuildingPrefab.transform.position.y;
             RenderPrefab(hit.point, yPos);
         }
+    }
+
+    private void RenderEngine(Vector3 position)
+    {
+        if (!trainEngineDrag.gameObject.activeSelf)
+        {
+            trainEngineDrag.gameObject.SetActive(true);
+        }
+
+        var gridCoord = GridPosToGridCoord(WorldToGridPos(position));
+        var gridPos = GridCoordToGridCoordPos(gridCoord);
+        var gridCell = gridCells.FirstOrDefault(gridCell => gridCell.rect.Contains(gridCoord));
+        if (gridCell != null)
+        {
+            var trainTrack = gridCell.building.GetComponent<TrainTrack>();
+            // Local position used to render relative to the grid layer container.
+            trainEngineDrag.transform.localPosition = gridPos;
+            trainEngineDrag.transform.rotation = Quaternion.Euler(0,
+                gridCell.building.transform.eulerAngles.y +
+                (trainTrack.TrackScriptableObject.TrackType == TrackType.Curve ? 45 : 0),
+                0);
+        }
+        else
+        {
+            // Local position used to render relative to the grid layer container.
+            trainEngineDrag.transform.localPosition = new Vector3(position.x, 0f, position.z);
+            trainEngineDrag.transform.rotation = Quaternion.Euler(0, currentRotation, 0);
+        }
+    }
+
+    private void PlaceEngine()
+    {
+        // Check if the engine is being placed on a track.
+        var gridCoord = GridPosToGridCoord(WorldToGridPos(trainEngineDrag.transform.position));
+        var gridPos = GridCoordToGridCoordPos(gridCoord);
+        var gridCell = gridCells.FirstOrDefault(gridCell => gridCell.rect.Contains(gridCoord));
+        if (gridCell == null) return;
+        var trainTrack = gridCell.building.GetComponent<TrainTrack>();
+        if (!trainTrack) return;
+        
+        trainEngineDrag.gameObject.SetActive(false);
+        isDraggingEngine = false;
+        var yRotation = gridCell.building.transform.eulerAngles.y +
+                        (trainTrack.TrackScriptableObject.TrackType == TrackType.Curve ? 45 : 0);
+        OnEnginePlaced?.Invoke(pickedUpTrainEngine ? pickedUpTrainEngine : Instantiate(trainEnginePrefab), gridPos,
+            yRotation);
     }
 
     private void ClearBuilding(Vector3 position)

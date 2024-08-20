@@ -1752,7 +1752,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.38268343, y: -3e-45, z: 1e-45, w: 0.92387956}
+  m_LocalRotation: {x: 0.38268343, y: 1e-45, z: -1e-45, w: 0.92387956}
   m_LocalPosition: {x: 0, y: 20, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -6451,7 +6451,9 @@ MonoBehaviour:
   gridCells: []
   activeLayerMask:
     serializedVersion: 2
-    m_Bits: 160
+    m_Bits: 129
+  trainEnginePrefab: {fileID: 9007747689508055930, guid: a9e951ea593fb8a4cb0902a8b1d81033,
+    type: 3}
 --- !u!65 &1814694447
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7162,7 +7164,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2069028443}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.38268343, y: -3e-45, z: 1e-45, w: 0.92387956}
+  m_LocalRotation: {x: 0.38268343, y: 1e-45, z: -1e-45, w: 0.92387956}
   m_LocalPosition: {x: 0, y: 20, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
