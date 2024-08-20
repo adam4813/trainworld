@@ -89,15 +89,18 @@ public class TableGrid : MonoBehaviour, ISaveable
     {
         currentRotation = 0; // Move to reset only when hot bar button is selected.
 
-        if (isDraggingEngine && pickedUpTrainEngine)
+        if (isDraggingEngine || trainEngineDrag)
         {
-            OnCancelEnginePickup?.Invoke(pickedUpTrainEngine);
-            pickedUpTrainEngine = null;
-            isDraggingEngine = false;
+            if (pickedUpTrainEngine)
+            {
+                OnCancelEnginePickup?.Invoke(pickedUpTrainEngine);
+                pickedUpTrainEngine = null;
+            }
             if (trainEngineDrag)
             {
                 Destroy(trainEngineDrag);
             }
+            isDraggingEngine = false;
         }
 
         if (buildingPrefab)
@@ -105,13 +108,13 @@ public class TableGrid : MonoBehaviour, ISaveable
             Destroy(buildingPrefab);
         }
 
-        if (selectedHotBarButton.EnginePrefab)
+        if (selectedHotBarButton?.EnginePrefab)
         {
             InstantiatedDragEngine(selectedHotBarButton.EnginePrefab);
             return;
         }
 
-        if (!selectedHotBarButton.BuildingPrefab)
+        if (!selectedHotBarButton?.BuildingPrefab)
         {
             buildingPrefab = null;
             return;
@@ -226,15 +229,16 @@ public class TableGrid : MonoBehaviour, ISaveable
         var gridCoord = GridPosToGridCoord(WorldToGridPos(position));
         var gridPos = GridCoordToGridCoordPos(gridCoord);
         var gridCell = gridCells.FirstOrDefault(gridCell => gridCell.rect.Contains(gridCoord));
-        if (gridCell != null)
+        var trainTrack = gridCell?.building.GetComponent<TrainTrack>();
+        if (trainTrack)
         {
-            var trainTrack = gridCell.building.GetComponent<TrainTrack>();
-            // Local position used to render relative to the grid layer container.
-            trainEngineDrag.transform.localPosition = gridPos;
-            trainEngineDrag.transform.rotation = Quaternion.Euler(0,
-                gridCell.building.transform.eulerAngles.y +
-                (trainTrack.TrackScriptableObject.TrackType == TrackType.Curve ? 45 : 0),
-                0);
+                // Local position used to render relative to the grid layer container.
+                trainEngineDrag.transform.localPosition = gridPos;
+                trainEngineDrag.transform.rotation = Quaternion.Euler(0,
+                    gridCell.building.transform.eulerAngles.y +
+                    (trainTrack.TrackScriptableObject.TrackType == TrackType.Curve ? 45 : 0),
+                    0);
+            
         }
         else
         {
