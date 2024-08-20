@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 763711e86c694bb4a755bee7eda6fb20, type: 3}
-  m_Name: YellowTrainEngineSO
+  m_Name: BeeTrainEngineSO
   m_EditorClassIdentifier: 
   enginePrefab: {fileID: 9007747689508055930, guid: a9e951ea593fb8a4cb0902a8b1d81033,
     type: 3}

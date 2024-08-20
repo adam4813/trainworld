@@ -176,7 +176,9 @@ public class TableGrid : MonoBehaviour, ISaveable
                 {
                     if (selectedHotBarButton?.EnginePrefab)
                     {
-                        PlaceEngine(Instantiate(selectedHotBarButton.EnginePrefab), hit.point);
+                        var instance = Instantiate(selectedHotBarButton.EnginePrefab);
+                        instance.Speed = selectedHotBarButton.trainEngineScriptableObject.EngineSpeed;
+                        PlaceEngine(instance, hit.point);
                     }
                 }
             }

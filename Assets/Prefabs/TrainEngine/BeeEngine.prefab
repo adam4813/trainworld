@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1295929490723008121}
   - component: {fileID: 9007747689508055930}
   m_Layer: 0
-  m_Name: YellowEngine
+  m_Name: BeeEngine
   m_TagString: TrainEngine
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

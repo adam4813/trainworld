@@ -8,4 +8,5 @@ public class TrainEngineScriptableObject : ScriptableObject
     [SerializeField] private float engineSpeed;
     
     public TrainEngine EnginePrefab => enginePrefab;
+    public float EngineSpeed => engineSpeed;
 }
