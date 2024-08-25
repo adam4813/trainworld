@@ -9,6 +9,7 @@ public class TrackManager : MonoBehaviour, ISaveable
     [SerializeField] private Transform trainEngineContainer;
     [SerializeField] private TrainEngine trainEnginesPrefab;
     [SerializeField] private TableGrid tableGrid;
+
     private void OnEnable()
     {
         tableGrid.OnBuildingPlaced += OnBuildingPlaced;
@@ -58,23 +59,7 @@ public class TrackManager : MonoBehaviour, ISaveable
     {
         if (!gridCell.building.TryGetComponent<TrainTrack>(out var trainTrack)) return;
 
-        trainTrack.rect = gridCell.rect;
-        trainTrack.rect.size = trainTrack.TrackScriptableObject.TrackSize;
-        if (trainTrack.rect.size.x > 1)
-        {
-            if (gridCell.building.transform.eulerAngles.y is 90 or 180)
-            {
-                trainTrack.rect.x -= 1;
-            }
-        }
-
-        if (trainTrack.rect.size.y > 1)
-        {
-            if (gridCell.building.transform.eulerAngles.y < 180)
-            {
-                trainTrack.rect.y -= 1;
-            }
-        }
+        trainTrack.UpdateRect(trainTrack.TrackScriptableObject.TrackSize);
 
         trainTracks.Add(trainTrack);
     }
@@ -94,12 +79,12 @@ public class TrackManager : MonoBehaviour, ISaveable
             if (engine.IsMoving || !engine.gameObject.activeSelf) continue;
 
             var enginePosition = engine.transform.position;
-            var engineGridCoord = tableGrid.GridPosToGridCoord(enginePosition);
-            var currentTrack = trainTracks.FirstOrDefault(trackCell => trackCell.rect.Contains(engineGridCoord));
+            var engineGridCoord = TableGrid.GridPosToGridCoord(enginePosition);
+            var currentTrack = trainTracks.FirstOrDefault(trackCell => trackCell.Rect.Contains(engineGridCoord));
 
             var nextEnginePosition = enginePosition + engine.EngineOffset() * 2f;
-            var nextEngineGridCoord = tableGrid.GridPosToGridCoord(nextEnginePosition);
-            var nextTrack = trainTracks.FirstOrDefault(trackCell => trackCell.rect.Contains(nextEngineGridCoord));
+            var nextEngineGridCoord = TableGrid.GridPosToGridCoord(nextEnginePosition);
+            var nextTrack = trainTracks.FirstOrDefault(trackCell => trackCell.Rect.Contains(nextEngineGridCoord));
 
             if (!currentTrack || !nextTrack || currentTrack == nextTrack) continue;
 
@@ -112,7 +97,7 @@ public class TrackManager : MonoBehaviour, ISaveable
                     ? 1
                     : -1
             );
-            
+
             engine.SetPath(path);
         }
     }
@@ -128,37 +113,19 @@ public class TrackManager : MonoBehaviour, ISaveable
         {
             saveData.TrainListSave.Add(trainSaveData);
         }
-        foreach (var trainTackSaveData in trainTracks.Select(trainTrack =>
-                 {
-                     var rect = trainTrack.rect;
-                     if (rect.size.x > 1)
-                     {
-                         if (trainTrack.transform.eulerAngles.y is 90 or 180)
-                         {
-                             rect.x += 1;
-                         }
-                     }
 
-                     if (rect.size.y > 1)
-                     {
-                         if (trainTrack.transform.eulerAngles.y < 180)
-                         {
-                             rect.y += 1;
-                         }
-                     }
-                     return new GridSaveData.GridCellSaveData()
-                     {
-                         position = new Vector2Int((int)rect.position.x, (int)rect.position.y),
-                         size = new Vector2Int((int)rect.size.x, (int)rect.size.y),
-                         trackScriptableObject = trainTrack.TrackScriptableObject,
-                         yRotation = trainTrack.transform.eulerAngles.y
-                     };
+        foreach (var trainTackSaveData in trainTracks.Select(trainTrack => new GridSaveData.GridCellSaveData()
+                 {
+                     pivotPoint = trainTrack.GetPivotPoint(),
+                     size = trainTrack.Size,
+                     trackScriptableObject = trainTrack.TrackScriptableObject,
+                     yRotation = trainTrack.transform.eulerAngles.y
                  }))
         {
             saveData.GridSave.gridCells.Add(trainTackSaveData);
         }
     }
-    
+
     public void LoadFromSaveData(SaveData saveData)
     {
         foreach (var trainEngine in trainEngines)

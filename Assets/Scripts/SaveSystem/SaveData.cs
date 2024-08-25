@@ -8,7 +8,7 @@ public struct GridSaveData
     [Serializable]
     public struct GridCellSaveData
     {
-        public Vector2Int position;
+        public Vector2Int pivotPoint;
         public Vector2Int size;
         public float yRotation;
         public TrackScriptableObject trackScriptableObject;

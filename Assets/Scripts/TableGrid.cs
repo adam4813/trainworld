@@ -18,8 +18,7 @@ public class TableGrid : MonoBehaviour, ISaveable
     [Serializable]
     public class GridCell
     {
-        public Rect rect;
-        public GameObject building;
+        public GridBuildable building;
     }
 
     [SerializeField] private AudioClip placeBuildingSound;
@@ -54,12 +53,7 @@ public class TableGrid : MonoBehaviour, ISaveable
             var child = gridLayerContainer.GetChild(i);
             var gridCell = new GridCell
             {
-                building = child.gameObject,
-                rect = new Rect
-                {
-                    position = GridPosToGridCoord(WorldToGridPos(child.position)),
-                    size = new Vector2(1, 1),
-                },
+                building = child.GetComponent<GridBuildable>()
             };
             gridCells.Add(gridCell);
             OnBuildingPlaced?.Invoke(gridCell);
@@ -101,10 +95,12 @@ public class TableGrid : MonoBehaviour, ISaveable
                 OnCancelEnginePickup?.Invoke(pickedUpTrainEngine);
                 pickedUpTrainEngine = null;
             }
+
             if (trainEngineDrag)
             {
                 Destroy(trainEngineDrag);
             }
+
             isDraggingEngine = false;
         }
 
@@ -220,7 +216,7 @@ public class TableGrid : MonoBehaviour, ISaveable
         if (selectedHotBarButton && buildingPrefab)
         {
             var yPos = selectedHotBarButton.BuildingPrefab.transform.position.y;
-            RenderPrefab(hit.point, yPos);
+            RenderPrefab(hit.point, yPos, selectedHotBarButton.BuildingSize);
         }
     }
 
@@ -233,17 +229,16 @@ public class TableGrid : MonoBehaviour, ISaveable
 
         var gridCoord = GridPosToGridCoord(WorldToGridPos(position));
         var gridPos = GridCoordToGridCoordPos(gridCoord);
-        var gridCell = gridCells.FirstOrDefault(gridCell => gridCell.rect.Contains(gridCoord));
+        var gridCell = gridCells.FirstOrDefault(gridCell => gridCell.building.Rect.Contains(gridCoord));
         var trainTrack = gridCell?.building.GetComponent<TrainTrack>();
         if (trainTrack)
         {
-                // Local position used to render relative to the grid layer container.
-                trainEngineDrag.transform.localPosition = gridPos;
-                trainEngineDrag.transform.rotation = Quaternion.Euler(0,
-                    gridCell.building.transform.eulerAngles.y +
-                    (trainTrack.TrackScriptableObject.TrackType == TrackType.Curve ? 45 : 0),
-                    0);
-            
+            // Local position used to render relative to the grid layer container.
+            trainEngineDrag.transform.localPosition = gridPos;
+            trainEngineDrag.transform.rotation = Quaternion.Euler(0,
+                gridCell.building.transform.eulerAngles.y +
+                (trainTrack.TrackScriptableObject.TrackType == TrackType.Curve ? 45 : 0),
+                0);
         }
         else
         {
@@ -259,7 +254,7 @@ public class TableGrid : MonoBehaviour, ISaveable
         // Check if the engine is being placed on a track.
         var gridCoord = GridPosToGridCoord(WorldToGridPos(position));
         var gridPos = GridCoordToGridCoordPos(gridCoord);
-        var gridCell = gridCells.FirstOrDefault(gridCell => gridCell.rect.Contains(gridCoord));
+        var gridCell = gridCells.FirstOrDefault(gridCell => gridCell.building.Rect.Contains(gridCoord));
         if (gridCell == null) return;
         var trainTrack = gridCell.building.GetComponent<TrainTrack>();
         if (!trainTrack) return;
@@ -278,7 +273,7 @@ public class TableGrid : MonoBehaviour, ISaveable
         var testRect = new Rect(gridCoord, Vector2.one);
         if (!GriCellsOccupied(testRect)) return;
 
-        var gridCell = gridCells.Find(cell => cell.rect.Overlaps(testRect));
+        var gridCell = gridCells.Find(cell => cell.building.Rect.Overlaps(testRect));
         ClearGridCell(gridCell);
         gridCells.Remove(gridCell);
     }
@@ -289,7 +284,7 @@ public class TableGrid : MonoBehaviour, ISaveable
         OnBuildingRemoved?.Invoke(gridCell);
     }
 
-    private void RenderPrefab(Vector3 position, float yPos)
+    private void RenderPrefab(Vector3 position, float yPos, Vector2 size)
     {
         if (!buildingPrefab.gameObject.activeSelf)
         {
@@ -297,6 +292,9 @@ public class TableGrid : MonoBehaviour, ISaveable
         }
 
         SetBuildingTransform(buildingPrefab, position, yPos);
+#if UNITY_EDITOR
+        buildingPrefab.GetComponent<GridBuildable>().UpdateRect(size);
+#endif
     }
 
     private void SetBuildingTransform(GameObject building, Vector3 position, float yPos)
@@ -311,28 +309,71 @@ public class TableGrid : MonoBehaviour, ISaveable
 
     private bool GriCellsOccupied(Rect buildingRect)
     {
-        return gridCells.Exists(cell => cell.rect.Overlaps(buildingRect));
+        return gridCells.Exists(cell => cell.building.Rect.Overlaps(buildingRect));
     }
 
     private void PlaceBuilding(Vector3 position, GameObject prefab, Vector2 size, float yPos)
     {
         audioSource.PlayOneShot(placeBuildingSound);
-        var buildingRect = new Rect
-        {
-            position = GridPosToGridCoord(WorldToGridPos(position)),
-            size = size
-        };
+        var buildingRect = CreateRotatedRect(WorldToGridPos(position), size, currentRotation);
         if (GriCellsOccupied(buildingRect)) return;
 
         var instance = Instantiate(prefab, gridLayerContainer);
         var gridCell = new GridCell
         {
-            building = instance,
-            rect = buildingRect,
+            building = instance.gameObject.GetComponent<GridBuildable>(),
         };
         gridCells.Add(gridCell);
         SetBuildingTransform(instance, position, yPos);
         OnBuildingPlaced?.Invoke(gridCell);
+    }
+
+    public static Rect CreateRotatedRect(Vector3 pivotPoint, Vector2 size, float yRotation)
+    {
+        var rect = new Rect
+        {
+            position = GridPosToGridCoord(pivotPoint),
+            size = size
+        };
+
+        if (ShouldShiftRectX(rect, yRotation))
+        {
+            rect.x -= rect.size.x - 1;
+        }
+
+        if (ShouldShiftRectY(rect, yRotation))
+        {
+            rect.y -= rect.size.y - 1;
+        }
+
+
+        return rect;
+    }
+
+    public static Vector2Int GetRectPivotPoint(Rect rect, float yRotation)
+    {
+        var pivotPoint = new Vector2Int(Mathf.RoundToInt(rect.position.x), Mathf.RoundToInt(rect.position.y));
+        if (ShouldShiftRectX(rect, yRotation))
+        {
+            pivotPoint.x += (int)rect.size.x - 1;
+        }
+
+        if (ShouldShiftRectY(rect, yRotation))
+        {
+            pivotPoint.y += (int)rect.size.y - 1;
+        }
+
+        return pivotPoint;
+    }
+
+    private static bool ShouldShiftRectX(Rect rect, float yRotation)
+    {
+        return rect.size.x > 1 && yRotation is 90 or 180 or -180 or -90;
+    }
+
+    private static bool ShouldShiftRectY(Rect rect, float yRotation)
+    {
+        return rect.size.y > 1 && yRotation < 180;
     }
 
     // Convert the world position to grid local position., within the grid layer container.
@@ -343,13 +384,13 @@ public class TableGrid : MonoBehaviour, ISaveable
     }
 
     // Convert the grid position to grid coordinates.
-    public Vector2 GridPosToGridCoord(Vector3 gridPos)
+    public static Vector2 GridPosToGridCoord(Vector3 gridPos)
     {
         return new Vector2(Mathf.Floor(gridPos.x), Mathf.Floor(gridPos.z));
     }
 
     // Convert the grid coordinates to grid local position, within the grid layer container.
-    private Vector3 GridCoordToGridCoordPos(Vector2 gridCoord)
+    private static Vector3 GridCoordToGridCoordPos(Vector2 gridCoord)
     {
         return new Vector3(gridCoord.x + 0.5f, 0, gridCoord.y + +0.5f); // Ignore the y-axis.
     }
@@ -372,10 +413,26 @@ public class TableGrid : MonoBehaviour, ISaveable
                          gridCellSaveData.buildingScriptableObject?.BuildingPrefab;
             if (!prefab) continue;
 
-            var position = new Vector3(gridCellSaveData.position.x, 0, gridCellSaveData.position.y);
+            var position = new Vector3(gridCellSaveData.pivotPoint.x, 0, gridCellSaveData.pivotPoint.y);
             var size = new Vector2(gridCellSaveData.size.x, gridCellSaveData.size.y);
             currentRotation = gridCellSaveData.yRotation;
             PlaceBuilding(position, prefab, size, prefab.transform.position.y);
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        foreach (var rect in gridCells.Select(gridCell => gridCell.building.Rect))
+        {
+            // draw the track rect
+            Debug.DrawLine(new Vector3(rect.xMin, transform.position.y, rect.yMin),
+                new Vector3(rect.xMax, transform.position.y, rect.yMin), Color.yellow);
+            Debug.DrawLine(new Vector3(rect.xMax, transform.position.y, rect.yMin),
+                new Vector3(rect.xMax, transform.position.y, rect.yMax), Color.yellow);
+            Debug.DrawLine(new Vector3(rect.xMax, transform.position.y, rect.yMax),
+                new Vector3(rect.xMin, transform.position.y, rect.yMax), Color.yellow);
+            Debug.DrawLine(new Vector3(rect.xMin, transform.position.y, rect.yMax),
+                new Vector3(rect.xMin, transform.position.y, rect.yMin), Color.yellow);
         }
     }
 }
