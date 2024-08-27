@@ -27,7 +27,6 @@ public class TableGrid : MonoBehaviour, ISaveable
     [SerializeField] private Transform gridLayerContainer;
     [SerializeField] private List<GridCell> gridCells;
     [SerializeField] private LayerMask activeLayerMask;
-    [SerializeField] private TrainEngine trainEnginePrefab;
     private float currentRotation;
     private Camera _camera;
     private GameObject buildingPrefab;
@@ -188,12 +187,14 @@ public class TableGrid : MonoBehaviour, ISaveable
             }
             else if (hit.collider.CompareTag("TrainEngine"))
             {
+                var trainEngine = hit.collider.GetComponent<TrainEngine>();
+                if (!trainEngine) return;
                 if (buildingPrefab)
                 {
                     Destroy(buildingPrefab);
                 }
 
-                InstantiatedDragEngine(trainEnginePrefab);
+                InstantiatedDragEngine(trainEngine.TrainEngineScriptableObject.EnginePrefab);
                 pickedUpTrainEngine = hit.collider.GetComponent<TrainEngine>();
                 OnEnginePickedUp?.Invoke(pickedUpTrainEngine);
             }
@@ -271,7 +272,7 @@ public class TableGrid : MonoBehaviour, ISaveable
         var gridCoord = GridPosToGridCoord(WorldToGridPos(position));
         var gridCell = gridCells.Find(cell => cell.building.Rect.Contains(gridCoord));
         if (gridCell == null) return;
-        
+
         audioSource.PlayOneShot(removeBuildingSound);
         ClearGridCell(gridCell);
         gridCells.Remove(gridCell);

@@ -69,6 +69,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 1
   engineSize: 0.8
+  trainEngineScriptableObject: {fileID: 11400000, guid: 78a2d93b648261b47b2b258ea841e1a1,
+    type: 2}
 --- !u!1 &3409350255178955014
 GameObject:
   m_ObjectHideFlags: 0

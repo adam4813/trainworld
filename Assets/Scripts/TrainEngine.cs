@@ -11,6 +11,9 @@ public class TrainEngine : MonoBehaviour
 
     [SerializeField] private float speed = 1;
     [SerializeField] private float engineSize = 1;
+    [SerializeField] private TrainEngineScriptableObject trainEngineScriptableObject;
+    public TrainEngineScriptableObject TrainEngineScriptableObject => trainEngineScriptableObject;
+
     private float distanceToTarget;
     private readonly Queue<PathNode> currentPath = new();
     private PathNode currentTarget;
