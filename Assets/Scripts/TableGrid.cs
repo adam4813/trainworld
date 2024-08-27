@@ -12,6 +12,7 @@ public class TableGrid : MonoBehaviour, ISaveable
 
     public event Action<TrainEngine, Vector3, float> OnEnginePlaced;
     public event Action<TrainEngine> OnEnginePickedUp;
+    public event Action<TrainEngine> OnEngineRemoved;
 
     public event Action<TrainEngine> OnCancelEnginePickup;
 
@@ -166,6 +167,14 @@ public class TableGrid : MonoBehaviour, ISaveable
 
         var selectedHotBarButton = HotBarManager.Instance?.ActiveHotBar?.SelectedHotBarButton;
 
+        if (Keyboard.current.deleteKey.wasPressedThisFrame && isDraggingEngine)
+        {
+            RemoveEngine(pickedUpTrainEngine);
+            Destroy(trainEngineDrag);
+            isDraggingEngine = false;
+            pickedUpTrainEngine = null;
+        }
+
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             if (isDraggingEngine)
@@ -219,6 +228,11 @@ public class TableGrid : MonoBehaviour, ISaveable
             var yPos = selectedHotBarButton.BuildingPrefab.transform.position.y;
             RenderPrefab(hit.point, yPos, selectedHotBarButton.BuildingSize);
         }
+    }
+
+    private void RemoveEngine(TrainEngine trainEngine)
+    {
+        OnEngineRemoved?.Invoke(trainEngine);
     }
 
     private void RenderEngine(Vector3 position)

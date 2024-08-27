@@ -24,6 +24,7 @@ public struct TrainSaveData
     public Vector3 position;
     public float yRotation;
     public float speed;
+    public TrainEngineScriptableObject trainEngineScriptableObject;
 }
 
 [Serializable]

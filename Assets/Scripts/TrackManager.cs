@@ -7,7 +7,6 @@ public class TrackManager : MonoBehaviour, ISaveable
     [SerializeField] private List<TrainTrack> trainTracks;
     [SerializeField] private List<TrainEngine> trainEngines;
     [SerializeField] private Transform trainEngineContainer;
-    [SerializeField] private TrainEngine trainEnginesPrefab;
     [SerializeField] private TableGrid tableGrid;
 
     private void OnEnable()
@@ -16,7 +15,14 @@ public class TrackManager : MonoBehaviour, ISaveable
         tableGrid.OnBuildingRemoved += OnBuildingRemoved;
         tableGrid.OnEnginePickedUp += OnTrainEnginePickedUp;
         tableGrid.OnEnginePlaced += OnTrainEnginePlaced;
+        tableGrid.OnEngineRemoved += OnTrainEngineRemoved;
         tableGrid.OnCancelEnginePickup += OnCancelTrainEnginePickup;
+    }
+
+    private void OnTrainEngineRemoved(TrainEngine trainEngine)
+    {
+        trainEngines.Remove(trainEngine);
+        Destroy(trainEngine.gameObject);
     }
 
     private void OnDisable()
@@ -25,6 +31,7 @@ public class TrackManager : MonoBehaviour, ISaveable
         tableGrid.OnBuildingRemoved -= OnBuildingRemoved;
         tableGrid.OnEnginePickedUp -= OnTrainEnginePickedUp;
         tableGrid.OnEnginePlaced -= OnTrainEnginePlaced;
+        tableGrid.OnEngineRemoved -= OnTrainEngineRemoved;
         tableGrid.OnCancelEnginePickup -= OnCancelTrainEnginePickup;
     }
 
@@ -108,7 +115,8 @@ public class TrackManager : MonoBehaviour, ISaveable
                  {
                      position = trainEngine.transform.position,
                      yRotation = trainEngine.transform.eulerAngles.y,
-                     speed = trainEngine.Speed
+                     speed = trainEngine.Speed,
+                     trainEngineScriptableObject = trainEngine.TrainEngineScriptableObject
                  }))
         {
             saveData.TrainListSave.Add(trainSaveData);
@@ -136,7 +144,7 @@ public class TrackManager : MonoBehaviour, ISaveable
         trainEngines.Clear();
         foreach (var trainSaveData in saveData.TrainListSave)
         {
-            var trainEngine = Instantiate(trainEnginesPrefab, trainEngineContainer);
+            var trainEngine = Instantiate(trainSaveData.trainEngineScriptableObject.EnginePrefab, trainEngineContainer);
             trainEngines.Add(trainEngine);
 
             trainEngine.transform.position = trainSaveData.position;

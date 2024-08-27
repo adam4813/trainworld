@@ -28,11 +28,11 @@ public class HotBarButton : MonoBehaviour
 
     public void Select()
     {
-        GetComponent<Image>().color = Color.green;
+        image.color = Color.green;
     }
 
     public void Deselect()
     {
-        GetComponent<Image>().color = Color.white;
+        image.color = Color.white;
     }
 }
