@@ -1644,7 +1644,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.38268343, y: 1e-45, z: -1e-45, w: 0.92387956}
+  m_LocalRotation: {x: 0.38268343, y: 1e-45, z: 0, w: 0.92387956}
   m_LocalPosition: {x: 0, y: 20, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4001,9 +4001,9 @@ MonoBehaviour:
   virtualCamera: {fileID: 2069028444}
   edgeScrolling: 0
   dragAndMove: 1
-  moveSpeed: 5
-  dragAndMoveSpeed: 5
-  rotateSpeed: 50
+  moveSpeed: 10
+  dragAndMoveSpeed: 1
+  rotateSpeed: 75
   zoomSpeed: 3
   zoomSensitivity: 1
   minZoom: 2
@@ -5366,7 +5366,7 @@ PrefabInstance:
         type: 3}
       propertyPath: sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 021128251002a6545b4270e89aa2949a,
+      objectReference: {fileID: 21300000, guid: 1e34cfa80e8a4094ea06d5676793ee1a,
         type: 3}
     - target: {fileID: 924747737491885053, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
@@ -5393,7 +5393,7 @@ PrefabInstance:
     - target: {fileID: 1746785914136347112, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
       propertyPath: m_Name
-      value: Big
+      value: BigYellow
       objectReference: {fileID: 0}
     - target: {fileID: 2602280407658179541, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
@@ -5549,7 +5549,7 @@ PrefabInstance:
     - target: {fileID: 3837774798714899299, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
       propertyPath: m_text
-      value: BigHouse
+      value: Big Yellow House
       objectReference: {fileID: 0}
     - target: {fileID: 8833005677520997167, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
@@ -7593,6 +7593,12 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 924747737491885053, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
+      propertyPath: sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 7648380e9d5b5cb42986a76a8093855c,
+        type: 3}
+    - target: {fileID: 924747737491885053, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
       propertyPath: buildingPrefab
       value: 
       objectReference: {fileID: 5355529380282786495, guid: 1bb89a8be4a12bf4690e223d16dc91bd,
@@ -7718,6 +7724,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2669084809884808515, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2669084809884808515, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2669084809884808515, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2763882564880307638, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -7814,6 +7835,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 496998526}
     m_Modifications:
+    - target: {fileID: 924747737491885053, guid: a37ae9e3f2547e243a1ed9a1e756321d,
+        type: 3}
+      propertyPath: sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 3aa078d07b8c2ba4e9a597ef10419397,
+        type: 3}
     - target: {fileID: 924747737491885053, guid: a37ae9e3f2547e243a1ed9a1e756321d,
         type: 3}
       propertyPath: buildingPrefab
@@ -8247,7 +8274,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2069028443}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.38268343, y: 1e-45, z: -1e-45, w: 0.92387956}
+  m_LocalRotation: {x: 0.38268343, y: 1e-45, z: -0, w: 0.92387956}
   m_LocalPosition: {x: 0, y: 20, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
