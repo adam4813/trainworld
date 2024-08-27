@@ -250,37 +250,36 @@ public class TableGrid : MonoBehaviour, ISaveable
 
     private void PlaceEngine(TrainEngine trainEngine, Vector3 position)
     {
-        audioSource.PlayOneShot(placeEngineSound);
         // Check if the engine is being placed on a track.
         var gridCoord = GridPosToGridCoord(WorldToGridPos(position));
-        var gridPos = GridCoordToGridCoordPos(gridCoord);
         var gridCell = gridCells.FirstOrDefault(gridCell => gridCell.building.Rect.Contains(gridCoord));
         if (gridCell == null) return;
         var trainTrack = gridCell.building.GetComponent<TrainTrack>();
         if (!trainTrack) return;
 
+        audioSource.PlayOneShot(placeEngineSound);
         isDraggingEngine = false;
         Destroy(trainEngineDrag);
         var yRotation = gridCell.building.transform.eulerAngles.y +
                         (trainTrack.TrackScriptableObject.TrackType == TrackType.Curve ? 45 : 0);
+        var gridPos = GridCoordToGridCoordPos(gridCoord);
         OnEnginePlaced?.Invoke(trainEngine, gridPos, yRotation);
     }
 
     private void ClearBuilding(Vector3 position)
     {
-        audioSource.PlayOneShot(removeBuildingSound);
         var gridCoord = GridPosToGridCoord(WorldToGridPos(position));
-        var testRect = new Rect(gridCoord, Vector2.one);
-        if (!GriCellsOccupied(testRect)) return;
-
-        var gridCell = gridCells.Find(cell => cell.building.Rect.Overlaps(testRect));
+        var gridCell = gridCells.Find(cell => cell.building.Rect.Contains(gridCoord));
+        if (gridCell == null) return;
+        
+        audioSource.PlayOneShot(removeBuildingSound);
         ClearGridCell(gridCell);
         gridCells.Remove(gridCell);
     }
 
     private void ClearGridCell(GridCell gridCell)
     {
-        Destroy(gridCell.building);
+        Destroy(gridCell.building.gameObject);
         OnBuildingRemoved?.Invoke(gridCell);
     }
 
