@@ -17,7 +17,7 @@ public enum TrackType
 [CreateAssetMenu(fileName = "Building", menuName = "Building/Track", order = 0)]
 public class TrackScriptableObject : ScriptableObject
 {
-    public GameObject trackPrefab;
+    public TrainTrack trackPrefab;
     public Vector2 trackSize;
     public TrackType trackType;
     public Sprite sprite;

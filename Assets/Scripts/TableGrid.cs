@@ -424,10 +424,8 @@ public class TableGrid : MonoBehaviour, ISaveable
         foreach (var gridCellSaveData in saveData.GridSave.gridCells)
         {
             GridBuildable gridBuildable = gridCellSaveData.terrainScriptableObject?.terrainBuildablePrefab ??
-                                          gridCellSaveData.trackScriptableObject?.trackPrefab
-                                              ?.GetComponent<GridBuildable>() ??
-                                          gridCellSaveData.buildingScriptableObject?.buildingPrefab
-                                              ?.GetComponent<GridBuildable>();
+                                          gridCellSaveData.trackScriptableObject?.trackPrefab ??
+                                          gridCellSaveData.buildingScriptableObject?.buildingPrefab?.GetComponent<GridBuildable>();
             if (!gridBuildable) continue;
 
             var position = new Vector3(gridCellSaveData.pivotPoint.x, 0, gridCellSaveData.pivotPoint.y);

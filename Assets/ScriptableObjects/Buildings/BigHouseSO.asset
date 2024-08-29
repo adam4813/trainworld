@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7f759172b1240cca6e0b79015341e18, type: 3}
   m_Name: BigHouseSO
   m_EditorClassIdentifier: 
-  buildingPrefab: {fileID: 7927807399380532107, guid: 68251126a9ea452489f1a18cb295485a,
+  buildingPrefab: {fileID: 5022815238264628651, guid: 68251126a9ea452489f1a18cb295485a,
     type: 3}
   buildingSize: {x: 3, y: 3}
   sprite: {fileID: 21300000, guid: 021128251002a6545b4270e89aa2949a, type: 3}

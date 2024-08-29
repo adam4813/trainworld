@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edc26de8b992462a93e35e0dfd46ddf4, type: 3}
   m_Name: CurveTrackSO
   m_EditorClassIdentifier: 
-  trackPrefab: {fileID: 5355529380282786495, guid: 1bb89a8be4a12bf4690e223d16dc91bd,
+  trackPrefab: {fileID: -8894404308247971844, guid: 1bb89a8be4a12bf4690e223d16dc91bd,
     type: 3}
   trackSize: {x: 2, y: 2}
   trackType: 1

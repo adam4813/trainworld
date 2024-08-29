@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edc26de8b992462a93e35e0dfd46ddf4, type: 3}
   m_Name: StraightTrackSO
   m_EditorClassIdentifier: 
-  trackPrefab: {fileID: 8102166386850302362, guid: 4a37fa85f618cce4ca0decc7768a9038,
+  trackPrefab: {fileID: 1748956735728488077, guid: 4a37fa85f618cce4ca0decc7768a9038,
     type: 3}
   trackSize: {x: 1, y: 1}
   trackType: 0
