@@ -27,7 +27,6 @@ public class TrainEngine : MonoBehaviour
 
     public void SetPath(List<Transform> path)
     {
-        //path.RemoveAt(0);
         foreach (var node in path)
         {
             var position = new Vector3(node.position.x, transform.position.y, node.position.z);
@@ -64,7 +63,6 @@ public class TrainEngine : MonoBehaviour
 
         if (currentTarget != null)
         {
-            //transform.rotation = Quaternion.Euler(0f, currentTarget.StartingRotationAngle, 0f);
             transform.LookAt(currentTarget.Position + targetOffset);
             distanceToTarget = Vector3.Distance(transform.position - EngineOffset(), currentTarget.Position);
         }
@@ -82,7 +80,6 @@ public class TrainEngine : MonoBehaviour
 
         var distanceTravelled = Speed * Time.deltaTime;
         distanceToTarget -= distanceTravelled;
-        //transform.position += Mathf.Clamp(distanceTravelled, 0f, distanceToTarget) * transform.forward;
         transform.position = Vector3.MoveTowards(transform.position,
             currentTarget.Position + EngineOffset(),
             Mathf.Clamp(distanceTravelled, 0f, distanceToTarget * 2f));

@@ -189,7 +189,7 @@ public class TableGrid : MonoBehaviour, ISaveable
                     if (selectedHotBarButton?.EnginePrefab)
                     {
                         var instance = Instantiate(selectedHotBarButton.EnginePrefab);
-                        instance.Speed = selectedHotBarButton.trainEngineScriptableObject.EngineSpeed;
+                        instance.Speed = selectedHotBarButton.trainEngineScriptableObject.engineSpeed;
                         PlaceEngine(instance, hit.point);
                     }
                 }
@@ -203,7 +203,7 @@ public class TableGrid : MonoBehaviour, ISaveable
                     Destroy(buildingPrefab);
                 }
 
-                InstantiatedDragEngine(trainEngine.TrainEngineScriptableObject.EnginePrefab);
+                InstantiatedDragEngine(trainEngine.TrainEngineScriptableObject.enginePrefab);
                 pickedUpTrainEngine = hit.collider.GetComponent<TrainEngine>();
                 OnEnginePickedUp?.Invoke(pickedUpTrainEngine);
             }
@@ -252,7 +252,7 @@ public class TableGrid : MonoBehaviour, ISaveable
             trainEngineDrag.transform.localPosition = gridPos;
             trainEngineDrag.transform.rotation = Quaternion.Euler(0,
                 gridCell.building.transform.eulerAngles.y +
-                (trainTrack.TrackScriptableObject.TrackType == TrackType.Curve ? 45 : 0),
+                (trainTrack.TrackScriptableObject.trackType == TrackType.Curve ? 45 : 0),
                 0);
         }
         else
@@ -276,7 +276,7 @@ public class TableGrid : MonoBehaviour, ISaveable
         isDraggingEngine = false;
         Destroy(trainEngineDrag);
         var yRotation = gridCell.building.transform.eulerAngles.y +
-                        (trainTrack.TrackScriptableObject.TrackType == TrackType.Curve ? 45 : 0);
+                        (trainTrack.TrackScriptableObject.trackType == TrackType.Curve ? 45 : 0);
         var gridPos = GridCoordToGridCoordPos(gridCoord);
         OnEnginePlaced?.Invoke(trainEngine, gridPos, yRotation);
     }
@@ -423,8 +423,8 @@ public class TableGrid : MonoBehaviour, ISaveable
         gridCells.Clear();
         foreach (var gridCellSaveData in saveData.GridSave.gridCells)
         {
-            var prefab = gridCellSaveData.trackScriptableObject?.TrackPrefab ??
-                         gridCellSaveData.buildingScriptableObject?.BuildingPrefab;
+            var prefab = gridCellSaveData.trackScriptableObject?.trackPrefab ??
+                         gridCellSaveData.buildingScriptableObject?.buildingPrefab;
             if (!prefab) continue;
 
             var position = new Vector3(gridCellSaveData.pivotPoint.x, 0, gridCellSaveData.pivotPoint.y);

@@ -17,19 +17,14 @@ public enum TrackType
 [CreateAssetMenu(fileName = "Building", menuName = "Building/Track", order = 0)]
 public class TrackScriptableObject : ScriptableObject
 {
-    [SerializeField] private GameObject trackPrefab;
-    [SerializeField] private Vector2 trackSize;
-    [SerializeField] private TrackType trackType;
-    [SerializeField] private Sprite sprite;
-    [SerializeField] private bool forwardConnection;
-    [SerializeField] private bool rightConnection;
-    [SerializeField] private bool backwardsConnection;
-    [SerializeField] private bool leftConnection;
-
-    public GameObject TrackPrefab => trackPrefab;
-    public Vector2 TrackSize => trackSize;
-    public TrackType TrackType => trackType;
-    public Sprite Sprite => sprite;
+    public GameObject trackPrefab;
+    public Vector2 trackSize;
+    public TrackType trackType;
+    public Sprite sprite;
+    public bool forwardConnection;
+    public bool rightConnection;
+    public bool backwardsConnection;
+    public bool leftConnection;
     
     public bool HasConnection(Direction direction)
     {

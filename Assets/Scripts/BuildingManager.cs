@@ -23,7 +23,7 @@ public class BuildingManager : MonoBehaviour, ISaveable
     {
         if (!gridCell.building.TryGetComponent<Building>(out var building)) return;
 
-        building.UpdateRect(building.BuildingScriptableObject.BuildingSize);
+        building.UpdateRect(building.BuildingScriptableObject.buildingSize);
 
         buildings.Add(building);
     }

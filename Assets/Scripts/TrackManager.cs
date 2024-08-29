@@ -66,7 +66,7 @@ public class TrackManager : MonoBehaviour, ISaveable
     {
         if (!gridCell.building.TryGetComponent<TrainTrack>(out var trainTrack)) return;
 
-        trainTrack.UpdateRect(trainTrack.TrackScriptableObject.TrackSize);
+        trainTrack.UpdateRect(trainTrack.TrackScriptableObject.trackSize);
 
         trainTracks.Add(trainTrack);
     }
@@ -144,7 +144,7 @@ public class TrackManager : MonoBehaviour, ISaveable
         trainEngines.Clear();
         foreach (var trainSaveData in saveData.TrainListSave)
         {
-            var trainEngine = Instantiate(trainSaveData.trainEngineScriptableObject.EnginePrefab, trainEngineContainer);
+            var trainEngine = Instantiate(trainSaveData.trainEngineScriptableObject.enginePrefab, trainEngineContainer);
             trainEngines.Add(trainEngine);
 
             trainEngine.transform.position = trainSaveData.position;

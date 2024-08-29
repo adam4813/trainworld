@@ -12,12 +12,15 @@ public class HotBarButton : MonoBehaviour
     public TrackScriptableObject trackScriptableObject;
     public TrainEngineScriptableObject trainEngineScriptableObject;
 
-    public GameObject BuildingPrefab => buildingScriptableObject?.BuildingPrefab ?? trackScriptableObject?.TrackPrefab;
+    [SerializeField] private GameObject prefab;
 
-    public Vector2 BuildingSize =>
-        buildingScriptableObject?.BuildingSize ?? trackScriptableObject?.TrackSize ?? new Vector2();
+    public GameObject BuildingPrefab =>
+        prefab ?? buildingScriptableObject?.buildingPrefab ?? trackScriptableObject?.trackPrefab;
 
-    public TrainEngine EnginePrefab => trainEngineScriptableObject?.EnginePrefab;
+    public Vector2 BuildingSize => prefab.GetComponent<GridBuildable>()?.Size ??
+        buildingScriptableObject?.buildingSize ?? trackScriptableObject?.trackSize ?? new Vector2();
+
+    public TrainEngine EnginePrefab => trainEngineScriptableObject?.enginePrefab;
 
     private void Awake()
     {
