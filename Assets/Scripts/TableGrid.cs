@@ -29,8 +29,8 @@ public class TableGrid : MonoBehaviour, ISaveable
     [SerializeField] private List<GridCell> gridCells;
     [SerializeField] private LayerMask activeLayerMask;
     private float currentRotation;
-    private Camera _camera;
-    private GameObject buildingPrefab;
+    private Camera mainCamera;
+    private GridBuildable gridBuildingPrefab;
     private GameObject trainEngineDrag;
     private TrainEngine pickedUpTrainEngine;
     private bool isDraggingEngine;
@@ -39,7 +39,7 @@ public class TableGrid : MonoBehaviour, ISaveable
     // Start is called before the first frame update
     private void Awake()
     {
-        _camera = Camera.main;
+        mainCamera = Camera.main;
         audioSource = GetComponent<AudioSource>();
     }
 
@@ -104,9 +104,9 @@ public class TableGrid : MonoBehaviour, ISaveable
             isDraggingEngine = false;
         }
 
-        if (buildingPrefab)
+        if (gridBuildingPrefab)
         {
-            Destroy(buildingPrefab);
+            Destroy(gridBuildingPrefab.gameObject);
         }
 
         if (selectedHotBarButton?.EnginePrefab)
@@ -117,14 +117,14 @@ public class TableGrid : MonoBehaviour, ISaveable
 
         if (!selectedHotBarButton?.BuildingPrefab)
         {
-            buildingPrefab = null;
+            gridBuildingPrefab = null;
             return;
         }
 
-        buildingPrefab = Instantiate(selectedHotBarButton.BuildingPrefab, gridLayerContainer);
+        gridBuildingPrefab = Instantiate(selectedHotBarButton.BuildingPrefab, gridLayerContainer);
         var yPos = selectedHotBarButton.BuildingPrefab.transform.position.y;
-        buildingPrefab.transform.position = new Vector3(0, yPos, 0);
-        buildingPrefab.transform.rotation = Quaternion.Euler(0, currentRotation, 0);
+        gridBuildingPrefab.transform.position = new Vector3(0, yPos, 0);
+        gridBuildingPrefab.transform.rotation = Quaternion.Euler(0, currentRotation, 0);
     }
 
     private void PlaceBuildingFromHotBar(Vector3 position)
@@ -147,14 +147,14 @@ public class TableGrid : MonoBehaviour, ISaveable
             }
         }
 
-        var ray = _camera.ScreenPointToRay(Mouse.current.position.ReadValue());
+        var ray = mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
         if (!Physics.Raycast(ray, out var hit, Mathf.Infinity, activeLayerMask) ||
             !(hit.collider.CompareTag("Grid") || hit.collider.CompareTag("TrainEngine")) ||
             EventSystem.current.IsPointerOverGameObject()) // Check if the mouse is over a UI element.
         {
-            if (buildingPrefab && buildingPrefab.gameObject.activeSelf)
+            if (gridBuildingPrefab && gridBuildingPrefab.gameObject.activeSelf)
             {
-                buildingPrefab.gameObject.SetActive(false);
+                gridBuildingPrefab.gameObject.SetActive(false);
             }
 
             if (trainEngineDrag && trainEngineDrag.gameObject.activeSelf)
@@ -198,9 +198,9 @@ public class TableGrid : MonoBehaviour, ISaveable
             {
                 var trainEngine = hit.collider.GetComponent<TrainEngine>();
                 if (!trainEngine) return;
-                if (buildingPrefab)
+                if (gridBuildingPrefab)
                 {
-                    Destroy(buildingPrefab);
+                    Destroy(gridBuildingPrefab.gameObject);
                 }
 
                 InstantiatedDragEngine(trainEngine.TrainEngineScriptableObject.enginePrefab);
@@ -223,10 +223,10 @@ public class TableGrid : MonoBehaviour, ISaveable
             return;
         }
 
-        if (selectedHotBarButton && buildingPrefab)
+        if (selectedHotBarButton && gridBuildingPrefab)
         {
             var yPos = selectedHotBarButton.BuildingPrefab.transform.position.y;
-            RenderPrefab(hit.point, yPos, selectedHotBarButton.BuildingSize);
+            RenderPrefab(hit.point, yPos, gridBuildingPrefab.GetSize());
         }
     }
 
@@ -300,18 +300,18 @@ public class TableGrid : MonoBehaviour, ISaveable
 
     private void RenderPrefab(Vector3 position, float yPos, Vector2 size)
     {
-        if (!buildingPrefab.gameObject.activeSelf)
+        if (!gridBuildingPrefab.gameObject.activeSelf)
         {
-            buildingPrefab.gameObject.SetActive(true);
+            gridBuildingPrefab.gameObject.SetActive(true);
         }
 
-        SetBuildingTransform(buildingPrefab, position, yPos);
+        SetBuildingTransform(gridBuildingPrefab, position, yPos);
 #if UNITY_EDITOR
-        buildingPrefab.GetComponent<GridBuildable>().UpdateRect(size);
+        gridBuildingPrefab.UpdateRect(size);
 #endif
     }
 
-    private void SetBuildingTransform(GameObject building, Vector3 position, float yPos)
+    private void SetBuildingTransform(GridBuildable building, Vector3 position, float yPos)
     {
         var gridCoord = GridPosToGridCoord(WorldToGridPos(position));
         var gridPos = GridCoordToGridCoordPos(gridCoord);
@@ -326,19 +326,19 @@ public class TableGrid : MonoBehaviour, ISaveable
         return gridCells.Exists(cell => cell.building.Rect.Overlaps(buildingRect));
     }
 
-    private void PlaceBuilding(Vector3 position, GameObject prefab, Vector2 size, float yPos)
+    private void PlaceBuilding(Vector3 position, GridBuildable prefab, Vector2 size, float yPos)
     {
         audioSource.PlayOneShot(placeBuildingSound);
         var buildingRect = CreateRotatedRect(WorldToGridPos(position), size, currentRotation);
         if (GriCellsOccupied(buildingRect)) return;
 
-        var instance = Instantiate(prefab, gridLayerContainer);
+        var building = Instantiate(prefab, gridLayerContainer);
         var gridCell = new GridCell
         {
-            building = instance.gameObject.GetComponent<GridBuildable>(),
+            building = building,
         };
         gridCells.Add(gridCell);
-        SetBuildingTransform(instance, position, yPos);
+        SetBuildingTransform(building, position, yPos);
         OnBuildingPlaced?.Invoke(gridCell);
     }
 
@@ -423,14 +423,17 @@ public class TableGrid : MonoBehaviour, ISaveable
         gridCells.Clear();
         foreach (var gridCellSaveData in saveData.GridSave.gridCells)
         {
-            var prefab = gridCellSaveData.trackScriptableObject?.trackPrefab ??
-                         gridCellSaveData.buildingScriptableObject?.buildingPrefab;
-            if (!prefab) continue;
+            GridBuildable gridBuildable = gridCellSaveData.terrainScriptableObject?.terrainBuildablePrefab ??
+                                          gridCellSaveData.trackScriptableObject?.trackPrefab
+                                              ?.GetComponent<GridBuildable>() ??
+                                          gridCellSaveData.buildingScriptableObject?.buildingPrefab
+                                              ?.GetComponent<GridBuildable>();
+            if (!gridBuildable) continue;
 
             var position = new Vector3(gridCellSaveData.pivotPoint.x, 0, gridCellSaveData.pivotPoint.y);
             var size = new Vector2(gridCellSaveData.size.x, gridCellSaveData.size.y);
             currentRotation = gridCellSaveData.yRotation;
-            PlaceBuilding(position, prefab, size, prefab.transform.position.y);
+            PlaceBuilding(position, gridBuildable, size, gridBuildable.transform.position.y);
         }
     }
 

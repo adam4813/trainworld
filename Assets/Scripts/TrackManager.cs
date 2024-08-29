@@ -66,7 +66,7 @@ public class TrackManager : MonoBehaviour, ISaveable
     {
         if (!gridCell.building.TryGetComponent<TrainTrack>(out var trainTrack)) return;
 
-        trainTrack.UpdateRect(trainTrack.TrackScriptableObject.trackSize);
+        trainTrack.UpdateRect(trainTrack.GetSize());
 
         trainTracks.Add(trainTrack);
     }
@@ -125,7 +125,7 @@ public class TrackManager : MonoBehaviour, ISaveable
         foreach (var trainTackSaveData in trainTracks.Select(trainTrack => new GridSaveData.GridCellSaveData()
                  {
                      pivotPoint = trainTrack.GetPivotPoint(),
-                     size = trainTrack.Size,
+                     size = trainTrack.GetSize(),
                      trackScriptableObject = trainTrack.TrackScriptableObject,
                      yRotation = trainTrack.transform.eulerAngles.y
                  }))

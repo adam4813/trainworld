@@ -12,6 +12,7 @@ public struct GridSaveData
         public Vector2Int size;
         public float yRotation;
         public TrackScriptableObject trackScriptableObject;
+        public TerrainScriptableObject terrainScriptableObject;
         public BuildingScriptableObject buildingScriptableObject;
     }
 

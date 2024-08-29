@@ -27,4 +27,9 @@ public class TrainTrack : GridBuildable
         return path?.nodes ?? new List<Transform>();*/
         return paths.First().nodes;
     }
+
+    public override Vector2Int GetSize()
+    {
+        return new Vector2Int((int)trackScriptableObject.trackSize.x, (int)trackScriptableObject.trackSize.y);
+    }
 }

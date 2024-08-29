@@ -2,14 +2,13 @@
 
 public abstract class GridBuildable : MonoBehaviour
 {
-    public Rect Rect;
+    public Rect Rect { get; private set; }
+    public abstract Vector2Int GetSize();
 
     public Vector2Int GetPivotPoint()
     {
         return TableGrid.GetRectPivotPoint(Rect, transform.eulerAngles.y);
     }
-
-    public Vector2Int Size => new((int)Rect.size.x, (int)Rect.size.y);
 
     private void OnDrawGizmos()
     {

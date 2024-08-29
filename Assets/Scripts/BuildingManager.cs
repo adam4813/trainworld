@@ -23,7 +23,7 @@ public class BuildingManager : MonoBehaviour, ISaveable
     {
         if (!gridCell.building.TryGetComponent<Building>(out var building)) return;
 
-        building.UpdateRect(building.BuildingScriptableObject.buildingSize);
+        building.UpdateRect(building.GetSize());
 
         buildings.Add(building);
     }
@@ -41,7 +41,7 @@ public class BuildingManager : MonoBehaviour, ISaveable
         foreach (var buildingData in buildings.Select(building => new GridSaveData.GridCellSaveData()
                  {
                      pivotPoint = building.GetPivotPoint(),
-                     size = building.Size,
+                     size = building.GetSize(),
                      buildingScriptableObject = building.BuildingScriptableObject,
                      yRotation = building.transform.eulerAngles.y
                  }))
