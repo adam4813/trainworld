@@ -344,20 +344,21 @@ public class TableGrid : MonoBehaviour, ISaveable
 
     public static Rect CreateRotatedRect(Vector3 pivotPoint, Vector2 size, float yRotation)
     {
+        var halfSize = new Vector2Int(Mathf.FloorToInt(size.x / 2f), Mathf.FloorToInt(size.y / 2f));
         var rect = new Rect
         {
-            position = GridPosToGridCoord(pivotPoint),
+            position = GridPosToGridCoord(pivotPoint) - halfSize,
             size = size
         };
 
-        if (ShouldShiftRectX(rect, yRotation))
+        if (size.x % 2 == 0 && ShouldShiftRectX(rect, yRotation))
         {
-            rect.x -= rect.size.x - 1;
+            rect.x += halfSize.x;
         }
 
-        if (ShouldShiftRectY(rect, yRotation))
+        if (size.y % 2 == 0 && ShouldShiftRectY(rect, yRotation))
         {
-            rect.y -= rect.size.y - 1;
+            rect.y += halfSize.y;
         }
 
 
@@ -367,17 +368,19 @@ public class TableGrid : MonoBehaviour, ISaveable
     public static Vector2Int GetRectPivotPoint(Rect rect, float yRotation)
     {
         var pivotPoint = new Vector2Int(Mathf.RoundToInt(rect.position.x), Mathf.RoundToInt(rect.position.y));
-        if (ShouldShiftRectX(rect, yRotation))
+        var size = rect.size;
+        var halfSize = new Vector2Int(Mathf.FloorToInt(size.x / 2f), Mathf.FloorToInt(size.y / 2f));
+        if (size.x % 2 == 0 && ShouldShiftRectX(rect, yRotation))
         {
-            pivotPoint.x += (int)rect.size.x - 1;
+            pivotPoint.x -= halfSize.x;
         }
 
-        if (ShouldShiftRectY(rect, yRotation))
+        if (size.x % 2 == 0 && ShouldShiftRectY(rect, yRotation))
         {
-            pivotPoint.y += (int)rect.size.y - 1;
+            pivotPoint.y -= halfSize.y;
         }
 
-        return pivotPoint;
+        return pivotPoint + halfSize;
     }
 
     private static bool ShouldShiftRectX(Rect rect, float yRotation)
@@ -387,7 +390,7 @@ public class TableGrid : MonoBehaviour, ISaveable
 
     private static bool ShouldShiftRectY(Rect rect, float yRotation)
     {
-        return rect.size.y > 1 && yRotation < 180;
+        return rect.size.y > 1 && yRotation is 0 or 90;
     }
 
     // Convert the world position to grid local position., within the grid layer container.
@@ -406,7 +409,7 @@ public class TableGrid : MonoBehaviour, ISaveable
     // Convert the grid coordinates to grid local position, within the grid layer container.
     private static Vector3 GridCoordToGridCoordPos(Vector2 gridCoord)
     {
-        return new Vector3(gridCoord.x + 0.5f, 0, gridCoord.y + +0.5f); // Ignore the y-axis.
+        return new Vector3(gridCoord.x + 0.5f, 0, gridCoord.y + 0.5f); // Ignore the y-axis.
     }
 
     public void PopulateSaveData(SaveData saveData)
@@ -425,7 +428,8 @@ public class TableGrid : MonoBehaviour, ISaveable
         {
             GridBuildable gridBuildable = gridCellSaveData.terrainScriptableObject?.terrainBuildablePrefab ??
                                           gridCellSaveData.trackScriptableObject?.trackPrefab ??
-                                          gridCellSaveData.buildingScriptableObject?.buildingPrefab?.GetComponent<GridBuildable>();
+                                          gridCellSaveData.buildingScriptableObject?.buildingPrefab
+                                              ?.GetComponent<GridBuildable>();
             if (!gridBuildable) continue;
 
             var position = new Vector3(gridCellSaveData.pivotPoint.x, 0, gridCellSaveData.pivotPoint.y);
