@@ -344,53 +344,26 @@ public class TableGrid : MonoBehaviour, ISaveable
 
     public static Rect CreateRotatedRect(Vector3 pivotPoint, Vector2 size, float yRotation)
     {
-        var halfSize = new Vector2Int(Mathf.FloorToInt(size.x / 2f), Mathf.FloorToInt(size.y / 2f));
-        var rect = new Rect
+        return new Rect
         {
-            position = GridPosToGridCoord(pivotPoint) - halfSize,
+            position = GridPosToGridCoord(pivotPoint) - GetRectOffset(size, yRotation),
             size = size
         };
-
-        if (size.x % 2 == 0 && ShouldShiftRectX(rect, yRotation))
-        {
-            rect.x += halfSize.x;
-        }
-
-        if (size.y % 2 == 0 && ShouldShiftRectY(rect, yRotation))
-        {
-            rect.y += halfSize.y;
-        }
-
-
-        return rect;
     }
 
     public static Vector2Int GetRectPivotPoint(Rect rect, float yRotation)
     {
-        var pivotPoint = new Vector2Int(Mathf.RoundToInt(rect.position.x), Mathf.RoundToInt(rect.position.y));
-        var size = rect.size;
-        var halfSize = new Vector2Int(Mathf.FloorToInt(size.x / 2f), Mathf.FloorToInt(size.y / 2f));
-        if (size.x % 2 == 0 && ShouldShiftRectX(rect, yRotation))
-        {
-            pivotPoint.x -= halfSize.x;
-        }
-
-        if (size.x % 2 == 0 && ShouldShiftRectY(rect, yRotation))
-        {
-            pivotPoint.y -= halfSize.y;
-        }
-
-        return pivotPoint + halfSize;
+        return Vector2Int.RoundToInt(rect.position) + GetRectOffset(rect.size, yRotation);
     }
 
-    private static bool ShouldShiftRectX(Rect rect, float yRotation)
+    private static Vector2Int GetRectOffset(Vector2 size, float yRotation)
     {
-        return rect.size.x > 1 && yRotation is 90 or 180 or -180 or -90;
-    }
-
-    private static bool ShouldShiftRectY(Rect rect, float yRotation)
-    {
-        return rect.size.y > 1 && yRotation is 0 or 90;
+        var isCenteredX = size.x % 2 == 0 && size.x > 1 && yRotation is 90 or 180 or -180 or -90;
+        var isCenteredY = size.y % 2 == 0 && size.y > 1 && yRotation is 0 or 90;
+        return new Vector2Int(
+            !isCenteredX ? Mathf.FloorToInt(size.x / 2f) : 0,
+            !isCenteredY ? Mathf.FloorToInt(size.y / 2f) : 0
+        );
     }
 
     // Convert the world position to grid local position., within the grid layer container.
