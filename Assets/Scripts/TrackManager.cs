@@ -77,22 +77,22 @@ public class TrackManager : MonoBehaviour, ISaveable
         trainEngine.transform.localPosition = new Vector3(position.x, -1.25f, position.z) + trainEngine.EngineOffset();
     }
 
-    private void OnBuildingPlaced(TableGrid.GridCell gridCell)
+    private void OnBuildingPlaced(GridBuildable buildable)
     {
-        if (gridCell.building.TryGetComponent<TrainTrack>(out var trainTrack))
+        if (buildable.TryGetComponent<TrainTrack>(out var trainTrack))
         {
             trainTrack.UpdateRect(trainTrack.GetSize());
             trainTracks.Add(trainTrack);
         }
-        else if (gridCell.building.TryGetComponent<TrainStation>(out var trainStation))
+        else if (buildable.TryGetComponent<TrainStation>(out var trainStation))
         {
             trainStations.Add(trainStation);
         }
     }
 
-    private void OnBuildingRemoved(TableGrid.GridCell gridCell)
+    private void OnBuildingRemoved(GridBuildable buildable)
     {
-        if (gridCell.building.TryGetComponent<TrainTrack>(out var trainTrack))
+        if (buildable.TryGetComponent<TrainTrack>(out var trainTrack))
         {
             trainTracks.Remove(trainTrack);
         }

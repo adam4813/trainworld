@@ -6,8 +6,8 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(AudioSource))]
 public class GridPlacementSystem : MonoBehaviour, ISaveable
 {
-    public static event Action<TableGrid.GridCell> OnBuildingPlaced;
-    public static event Action<TableGrid.GridCell> OnBuildingRemoved;
+    public static event Action<GridBuildable> OnBuildingPlaced;
+    public static event Action<GridBuildable> OnBuildingRemoved;
     public static event Action<TrainEngine, Vector3, float> OnEnginePlaced;
     public static event Action<TrainEngine> OnEnginePickedUp;
     public static event Action<TrainEngine> OnEngineRemoved;
@@ -44,7 +44,7 @@ public class GridPlacementSystem : MonoBehaviour, ISaveable
                 building = child.GetComponent<GridBuildable>()
             };
             tableGrid.AddGridCell(gridCell);
-            OnBuildingPlaced?.Invoke(gridCell);
+            OnBuildingPlaced?.Invoke(gridCell.building);
         }
     }
     
@@ -218,9 +218,9 @@ public class GridPlacementSystem : MonoBehaviour, ISaveable
         }
     }
 
-    private bool CanPlaceEngine(Vector3 hitInfoPoint)
+    private bool CanPlaceEngine(Vector3 position)
     {
-        var gridCell = tableGrid.FindGridCell(hitInfoPoint);
+        var gridCell = tableGrid.FindGridCell(position);
         if (gridCell == null) return false;
         var trainTrack = gridCell.building.GetComponent<TrainTrack>();
         return trainTrack;
@@ -284,7 +284,7 @@ public class GridPlacementSystem : MonoBehaviour, ISaveable
 
         audioSource.PlayOneShot(removeBuildingSound);
         tableGrid.ClearGridCell(gridCell);
-        OnBuildingRemoved?.Invoke(gridCell);
+        OnBuildingRemoved?.Invoke(gridCell.building);
     }
 
     private void RenderPrefab(Vector3 position, float yPos, Vector2 size)
@@ -324,7 +324,7 @@ public class GridPlacementSystem : MonoBehaviour, ISaveable
         };
         tableGrid.AddGridCell(gridCell);
         SetBuildingTransform(building, position, yPos);
-        OnBuildingPlaced?.Invoke(gridCell);
+        OnBuildingPlaced?.Invoke(building);
     }
 
     public static Rect CreateBuildingRect(Vector3 pivotPoint, Vector2 size, float yRotation)

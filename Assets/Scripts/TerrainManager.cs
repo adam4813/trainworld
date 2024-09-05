@@ -19,18 +19,18 @@ public class TerrainManager : MonoBehaviour, ISaveable
         GridPlacementSystem.OnBuildingRemoved -= OnBuildingRemoved;
     }
 
-    private void OnBuildingPlaced(TableGrid.GridCell gridCell)
+    private void OnBuildingPlaced(GridBuildable buildable)
     {
-        if (!gridCell.building.TryGetComponent<TerrainBuildable>(out var terrain)) return;
+        if (!buildable.TryGetComponent<TerrainBuildable>(out var terrain)) return;
 
         terrain.UpdateRect(terrain.GetSize());
 
         terrainBuildables.Add(terrain);
     }
 
-    private void OnBuildingRemoved(TableGrid.GridCell gridCell)
+    private void OnBuildingRemoved(GridBuildable buildable)
     {
-        if (gridCell.building.TryGetComponent<TerrainBuildable>(out var building))
+        if (buildable.TryGetComponent<TerrainBuildable>(out var building))
         {
             terrainBuildables.Remove(building);
         }

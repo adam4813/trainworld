@@ -26,17 +26,17 @@ public class PopularityManager : MonoBehaviour
         GridPlacementSystem.OnBuildingRemoved -= OnBuildingRemoved;
     }
 
-    private void OnBuildingPlaced(TableGrid.GridCell gridCell)
+    private void OnBuildingPlaced(GridBuildable buildable)
     {
-        if (!gridCell.building.TryGetComponent<Building>(out var building)) return;
+        if (!buildable.TryGetComponent<Building>(out var building)) return;
 
         var buildingScriptableObject = building.BuildingScriptableObject;
         SetPopularity(popularity + buildingScriptableObject.popularity);
     }
 
-    private void OnBuildingRemoved(TableGrid.GridCell gridCell)
+    private void OnBuildingRemoved(GridBuildable buildable)
     {
-        if (!gridCell.building.TryGetComponent<Building>(out var building)) return;
+        if (!buildable.TryGetComponent<Building>(out var building)) return;
 
         var buildingScriptableObject = building.BuildingScriptableObject;
         SetPopularity(popularity - buildingScriptableObject.popularity);
