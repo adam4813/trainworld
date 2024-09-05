@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7441235559920326196}
   - component: {fileID: 1295929490723008121}
   - component: {fileID: 9007747689508055930}
+  - component: {fileID: 4915081334828205544}
   m_Layer: 0
   m_Name: BeeEngine
   m_TagString: TrainEngine
@@ -47,7 +48,7 @@ BoxCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 192
+    m_Bits: 128
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -71,6 +72,33 @@ MonoBehaviour:
   engineSize: 0.8
   trainEngineScriptableObject: {fileID: 11400000, guid: f26485577e3f03f47a4230f69fd5408c,
     type: 2}
+--- !u!54 &4915081334828205544
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1738114254265203480}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &3409350255178955014
 GameObject:
   m_ObjectHideFlags: 0

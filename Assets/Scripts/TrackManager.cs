@@ -6,8 +6,23 @@ public class TrackManager : MonoBehaviour, ISaveable
 {
     [SerializeField] private List<TrainTrack> trainTracks;
     [SerializeField] private List<TrainEngine> trainEngines;
+    [SerializeField] private List<TrainStation> trainStations;
     [SerializeField] private Transform trainEngineContainer;
     [SerializeField] private TableGrid tableGrid;
+
+    public static TrackManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     private void OnEnable()
     {
@@ -64,11 +79,15 @@ public class TrackManager : MonoBehaviour, ISaveable
 
     private void OnBuildingPlaced(TableGrid.GridCell gridCell)
     {
-        if (!gridCell.building.TryGetComponent<TrainTrack>(out var trainTrack)) return;
-
-        trainTrack.UpdateRect(trainTrack.GetSize());
-
-        trainTracks.Add(trainTrack);
+        if (gridCell.building.TryGetComponent<TrainTrack>(out var trainTrack))
+        {
+            trainTrack.UpdateRect(trainTrack.GetSize());
+            trainTracks.Add(trainTrack);
+        }
+        else if (gridCell.building.TryGetComponent<TrainStation>(out var trainStation))
+        {
+            trainStations.Add(trainStation);
+        }
     }
 
     private void OnBuildingRemoved(TableGrid.GridCell gridCell)
@@ -152,5 +171,11 @@ public class TrackManager : MonoBehaviour, ISaveable
             trainEngine.Speed = trainSaveData.speed;
             trainEngine.gameObject.SetActive(true);
         }
+    }
+
+    public TrainStation GetNextStation(TrainStation currentStation, TrainTrack connectedTrack)
+    {
+        // Todo: Implement this method
+        return trainStations[Random.Range(0, trainStations.Count)];
     }
 }

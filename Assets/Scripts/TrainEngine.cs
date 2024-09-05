@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using Vector3 = UnityEngine.Vector3;
 
 public class TrainEngine : MonoBehaviour
 {
@@ -17,13 +17,17 @@ public class TrainEngine : MonoBehaviour
     private float distanceToTarget;
     private readonly Queue<PathNode> currentPath = new();
     private PathNode currentTarget;
-    public bool IsMoving => currentPath.Count > 0;
+    [SerializeField] private TrainStation dockedStation;
+    [SerializeField] private TrainCargo cargo;
+    public bool IsMoving => currentPath.Count > 0 || dockedStation != null;
 
     public float Speed
     {
         get => speed;
         set => speed = value;
     }
+
+    public TrainCargo Cargo => cargo;
 
     public void SetPath(List<Transform> path)
     {
@@ -37,6 +41,16 @@ public class TrainEngine : MonoBehaviour
         }
 
         UpdateCurrentTarget();
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!other.TryGetComponent(out TrainStation trainStation)) return;
+
+        if (!dockedStation)
+        {
+            StartCoroutine(DockAtStation(trainStation));
+        }
     }
 
     public Vector3 EngineOffset()
@@ -105,5 +119,34 @@ public class TrainEngine : MonoBehaviour
         distanceToTarget = 0;
         currentPath.Clear();
         currentTarget = null;
+    }
+
+    public TrainCargo UnloadCargo()
+    {
+        var tempCargo = cargo;
+        cargo = null;
+        return tempCargo;
+    }
+
+    public void LoadCargo(TrainCargo stationCargo)
+    {
+        cargo = stationCargo;
+    }
+
+    private IEnumerator DockAtStation(TrainStation trainStation)
+    {
+        while (trainStation.DockedTrainEngine && trainStation.DockedTrainEngine != this)
+        {
+            yield return new WaitForSeconds(1f);
+        }
+
+        trainStation.OnTrainDocked(this);
+        dockedStation = trainStation;
+    }
+
+    public void FinishedDocking(TrainStation trainStation)
+    {
+        trainStation.OnTrainDeparted(this);
+        dockedStation = null;
     }
 }

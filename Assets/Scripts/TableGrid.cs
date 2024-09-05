@@ -323,7 +323,7 @@ public class TableGrid : MonoBehaviour, ISaveable
 
     private bool GriCellsOccupied(Rect buildingRect)
     {
-        return gridCells.Exists(cell => cell.building.Rect.Overlaps(buildingRect));
+        return gridCells.Exists(cell => cell.building.Rect.Overlaps(buildingRect) && !cell.building.TryGetComponent<TrainStation>(out _));
     }
 
     private void PlaceBuilding(Vector3 position, GridBuildable prefab, Vector2 size, float yPos)
