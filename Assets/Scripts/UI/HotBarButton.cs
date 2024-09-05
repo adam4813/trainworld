@@ -5,18 +5,12 @@ public class HotBarButton : MonoBehaviour
 {
     [SerializeField] private Sprite sprite;
     [SerializeField] private Image image;
-
-    private AudioSource audioSource;
-
-    public TrainEngineScriptableObject trainEngineScriptableObject;
-
     [SerializeField] private GridBuildable prefab;
-
+    [SerializeField] private TrainEngine enginePrefab;
+    private AudioSource audioSource;
+    
     public GridBuildable BuildingPrefab => prefab;
-
-    public Vector2 BuildingSize => prefab?.GetSize() ?? new Vector2();
-
-    public TrainEngine EnginePrefab => trainEngineScriptableObject?.enginePrefab;
+    public TrainEngine EnginePrefab => enginePrefab;
 
     private void Awake()
     {

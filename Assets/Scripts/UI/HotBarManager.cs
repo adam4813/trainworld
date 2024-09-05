@@ -7,10 +7,12 @@ public class HotBarManager : MonoBehaviour
     [SerializeField] private List<HotBar> hotBars;
     [SerializeField] private HotBarButton deleteButton;
     private int activeHotBarIndex = -1;
+    private bool isDeleteButtonSelected;
 
     public static HotBarManager Instance { get; private set; }
 
     public HotBar ActiveHotBar => activeHotBarIndex == -1 ? null : hotBars[activeHotBarIndex];
+    public bool IsDeleteButtonSelected => isDeleteButtonSelected;
 
     private void Awake()
     {
@@ -28,6 +30,7 @@ public class HotBarManager : MonoBehaviour
             hotBars[activeHotBarIndex].gameObject.SetActive(false);
             activeHotBarIndex = -1;
             HotBar.FireHotBarButtonClicked(deleteButton);
+            isDeleteButtonSelected = true;
             deleteButton.GetComponent<AudioSource>().Play();
         });
     }
@@ -53,6 +56,7 @@ public class HotBarManager : MonoBehaviour
 
                 activeHotBarIndex = index;
                 hotBars[activeHotBarIndex].gameObject.SetActive(true);
+                isDeleteButtonSelected = false;
             });
         }
     }

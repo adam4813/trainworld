@@ -28,18 +28,20 @@ public class PopularityManager : MonoBehaviour
 
     private void OnBuildingPlaced(GridBuildable buildable)
     {
-        if (!buildable.TryGetComponent<Building>(out var building)) return;
-
-        var buildingScriptableObject = building.BuildingScriptableObject;
-        SetPopularity(popularity + buildingScriptableObject.popularity);
+        SetPopularity(popularity + GetBuildingPopularity(buildable));
     }
 
     private void OnBuildingRemoved(GridBuildable buildable)
     {
-        if (!buildable.TryGetComponent<Building>(out var building)) return;
+        SetPopularity(popularity - GetBuildingPopularity(buildable));
+    }
+    
+    private static int GetBuildingPopularity(GridBuildable buildable)
+    {
+        if (!buildable.TryGetComponent<Building>(out var building)) return 0;
 
         var buildingScriptableObject = building.BuildingScriptableObject;
-        SetPopularity(popularity - buildingScriptableObject.popularity);
+        return buildingScriptableObject.popularity;
     }
 
     private void SetPopularity(int value)

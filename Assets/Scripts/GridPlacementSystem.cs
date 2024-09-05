@@ -177,29 +177,28 @@ public class GridPlacementSystem : MonoBehaviour, ISaveable
                     if (selectedHotBarButton?.EnginePrefab)
                     {
                         var instance = Instantiate(selectedHotBarButton.EnginePrefab);
-                        instance.Speed = selectedHotBarButton.trainEngineScriptableObject.engineSpeed;
+                        instance.Speed = instance.TrainEngineScriptableObject.engineSpeed;
                         PlaceEngine(instance, hit.point);
                     }
                 }
             }
             else if (hit.collider.CompareTag("TrainEngine"))
             {
-                var trainEngine = hit.collider.GetComponent<TrainEngine>();
-                if (!trainEngine) return;
+                pickedUpTrainEngine = hit.collider.GetComponent<TrainEngine>();
+                if (!pickedUpTrainEngine) return;
                 if (gridBuildingPrefab)
                 {
                     Destroy(gridBuildingPrefab.gameObject);
                 }
 
-                InstantiatedDragEngine(trainEngine.TrainEngineScriptableObject.enginePrefab);
-                pickedUpTrainEngine = hit.collider.GetComponent<TrainEngine>();
+                InstantiatedDragEngine(pickedUpTrainEngine.TrainEngineScriptableObject.enginePrefab);
                 OnEnginePickedUp?.Invoke(pickedUpTrainEngine);
             }
             else if (selectedHotBarButton?.BuildingPrefab)
             {
                 PlaceBuildingFromHotBar(hit.point);
             }
-            else
+            else if (HotBarManager.Instance?.IsDeleteButtonSelected == true)
             {
                 ClearBuilding(hit.point);
             }
@@ -207,14 +206,14 @@ public class GridPlacementSystem : MonoBehaviour, ISaveable
 
         if (isDraggingEngine)
         {
-            RenderEngine(hit.point);
+            RenderDragEngine(hit.point);
             return;
         }
 
         if (selectedHotBarButton && gridBuildingPrefab)
         {
             var yPos = selectedHotBarButton.BuildingPrefab.transform.position.y;
-            RenderPrefab(hit.point, yPos, gridBuildingPrefab.GetSize());
+            RenderDragPrefab(hit.point, yPos, gridBuildingPrefab.GetSize());
         }
     }
 
@@ -231,7 +230,7 @@ public class GridPlacementSystem : MonoBehaviour, ISaveable
         OnEngineRemoved?.Invoke(trainEngine);
     }
 
-    private void RenderEngine(Vector3 position)
+    private void RenderDragEngine(Vector3 position)
     {
         if (!trainEngineDrag.gameObject.activeSelf)
         {
@@ -287,7 +286,7 @@ public class GridPlacementSystem : MonoBehaviour, ISaveable
         OnBuildingRemoved?.Invoke(gridCell.building);
     }
 
-    private void RenderPrefab(Vector3 position, float yPos, Vector2 size)
+    private void RenderDragPrefab(Vector3 position, float yPos, Vector2 size)
     {
         if (!gridBuildingPrefab.gameObject.activeSelf)
         {
