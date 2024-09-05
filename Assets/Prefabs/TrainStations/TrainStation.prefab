@@ -100,12 +100,12 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 0.5, y: 1, z: 0.75}
+  m_Center: {x: -0.25, y: 0, z: 0}
 --- !u!114 &1903033646033528083
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -122,3 +122,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 67ad9da7878a21b45b4e979412de97fa, type: 2}
   - {fileID: 11400000, guid: a5e14b3d6bb00994e8dab0c554139c6f, type: 2}
   stationSize: {x: 2, y: 1}
+  connectedTrack: {fileID: 0}
+  inCargo:
+    Destination: {fileID: 0}
+    CargoScriptableObject: {fileID: 0}
+  outCargo:
+    Destination: {fileID: 0}
+    CargoScriptableObject: {fileID: 0}
+  dockedTrainEngine: {fileID: 0}
