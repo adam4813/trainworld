@@ -26,12 +26,12 @@ public class TrackManager : MonoBehaviour, ISaveable
 
     private void OnEnable()
     {
-        tableGrid.OnBuildingPlaced += OnBuildingPlaced;
-        tableGrid.OnBuildingRemoved += OnBuildingRemoved;
-        tableGrid.OnEnginePickedUp += OnTrainEnginePickedUp;
-        tableGrid.OnEnginePlaced += OnTrainEnginePlaced;
-        tableGrid.OnEngineRemoved += OnTrainEngineRemoved;
-        tableGrid.OnCancelEnginePickup += OnCancelTrainEnginePickup;
+        GridPlacementSystem.OnBuildingPlaced += OnBuildingPlaced;
+        GridPlacementSystem.OnBuildingRemoved += OnBuildingRemoved;
+        GridPlacementSystem.OnEnginePickedUp += OnTrainEnginePickedUp;
+        GridPlacementSystem.OnEnginePlaced += OnTrainEnginePlaced;
+        GridPlacementSystem.OnEngineRemoved += OnTrainEngineRemoved;
+        GridPlacementSystem.OnCancelEnginePickup += OnCancelTrainEnginePickup;
     }
 
     private void OnTrainEngineRemoved(TrainEngine trainEngine)
@@ -42,12 +42,12 @@ public class TrackManager : MonoBehaviour, ISaveable
 
     private void OnDisable()
     {
-        tableGrid.OnBuildingPlaced -= OnBuildingPlaced;
-        tableGrid.OnBuildingRemoved -= OnBuildingRemoved;
-        tableGrid.OnEnginePickedUp -= OnTrainEnginePickedUp;
-        tableGrid.OnEnginePlaced -= OnTrainEnginePlaced;
-        tableGrid.OnEngineRemoved -= OnTrainEngineRemoved;
-        tableGrid.OnCancelEnginePickup -= OnCancelTrainEnginePickup;
+        GridPlacementSystem.OnBuildingPlaced -= OnBuildingPlaced;
+        GridPlacementSystem.OnBuildingRemoved -= OnBuildingRemoved;
+        GridPlacementSystem.OnEnginePickedUp -= OnTrainEnginePickedUp;
+        GridPlacementSystem.OnEnginePlaced -= OnTrainEnginePlaced;
+        GridPlacementSystem.OnEngineRemoved -= OnTrainEngineRemoved;
+        GridPlacementSystem.OnCancelEnginePickup -= OnCancelTrainEnginePickup;
     }
 
     private void OnCancelTrainEnginePickup(TrainEngine trainEngine)

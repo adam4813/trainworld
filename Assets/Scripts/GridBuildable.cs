@@ -26,6 +26,6 @@ public abstract class GridBuildable : MonoBehaviour
     [ContextMenu("Update Rect")]
     public void UpdateRect(Vector2 size)
     {
-        Rect = TableGrid.CreateBuildingRect(transform.position, size, transform.eulerAngles.y);
+        Rect = GridPlacementSystem.CreateBuildingRect(transform.position, size, transform.eulerAngles.y);
     }
 }

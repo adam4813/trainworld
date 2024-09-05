@@ -16,14 +16,14 @@ public class PopularityManager : MonoBehaviour
 
     private void OnEnable()
     {
-        tableGrid.OnBuildingPlaced += OnBuildingPlaced;
-        tableGrid.OnBuildingRemoved += OnBuildingRemoved;
+        GridPlacementSystem.OnBuildingPlaced += OnBuildingPlaced;
+        GridPlacementSystem.OnBuildingRemoved += OnBuildingRemoved;
     }
 
     private void OnDisable()
     {
-        tableGrid.OnBuildingPlaced -= OnBuildingPlaced;
-        tableGrid.OnBuildingRemoved -= OnBuildingRemoved;
+        GridPlacementSystem.OnBuildingPlaced -= OnBuildingPlaced;
+        GridPlacementSystem.OnBuildingRemoved -= OnBuildingRemoved;
     }
 
     private void OnBuildingPlaced(TableGrid.GridCell gridCell)
