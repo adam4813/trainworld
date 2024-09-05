@@ -313,24 +313,26 @@ public class TableGrid : MonoBehaviour, ISaveable
 
     private void SetBuildingTransform(GridBuildable building, Vector3 position, float yPos)
     {
-        var gridCoord = GridPosToGridCoord(WorldToGridPos(position));
-        var gridPos = GridCoordToGridCoordPos(gridCoord);
-        gridPos.y = yPos;
+        var worldPivotPoint = GetPivotPoint(position, building.GetSize(), currentRotation);
+        worldPivotPoint.y = yPos;
         building.transform.localPosition =
-            gridPos; // Local position used to render relative to the grid layer container.
+            worldPivotPoint; // Local position used to render relative to the grid layer container.
         building.transform.rotation = Quaternion.Euler(0, currentRotation, 0);
     }
 
     private bool GriCellsOccupied(Rect buildingRect)
     {
-        return gridCells.Exists(cell => cell.building.Rect.Overlaps(buildingRect) && !cell.building.TryGetComponent<TrainStation>(out _));
+        return gridCells.Exists(cell =>
+            cell.building.Rect.Overlaps(buildingRect) && !cell.building.TryGetComponent<TrainStation>(out _));
     }
 
     private void PlaceBuilding(Vector3 position, GridBuildable prefab, Vector2 size, float yPos)
     {
-        audioSource.PlayOneShot(placeBuildingSound);
-        var buildingRect = CreateRotatedRect(WorldToGridPos(position), size, currentRotation);
+        var worldPivotPoint = GetPivotPoint(position, size, currentRotation);
+        var buildingRect = CreateBuildingRect(worldPivotPoint, size, currentRotation);
         if (GriCellsOccupied(buildingRect)) return;
+        
+        audioSource.PlayOneShot(placeBuildingSound);
 
         var building = Instantiate(prefab, gridLayerContainer);
         var gridCell = new GridCell
@@ -342,7 +344,7 @@ public class TableGrid : MonoBehaviour, ISaveable
         OnBuildingPlaced?.Invoke(gridCell);
     }
 
-    public static Rect CreateRotatedRect(Vector3 pivotPoint, Vector2 size, float yRotation)
+    public static Rect CreateBuildingRect(Vector3 pivotPoint, Vector2 size, float yRotation)
     {
         return new Rect
         {
@@ -350,13 +352,13 @@ public class TableGrid : MonoBehaviour, ISaveable
             size = size
         };
     }
-
-    public static Vector2Int GetRectPivotPoint(Rect rect, float yRotation)
+    
+    public Vector3 GetPivotPoint(Vector3 position, Vector2 size, float yRotation)
     {
-        return Vector2Int.RoundToInt(rect.position) + GetRectOffset(rect.size, yRotation);
+        return GridCoordToGridCoordPos(GridPosToGridCoord(WorldToGridPos(position)) + GetRectOffset(size, yRotation));
     }
 
-    private static Vector2Int GetRectOffset(Vector2 size, float yRotation)
+    public static Vector2Int GetRectOffset(Vector2 size, float yRotation)
     {
         var isCenteredX = size.x % 2 == 0 && size.x > 1 && yRotation is 90 or 180 or -180 or -90;
         var isCenteredY = size.y % 2 == 0 && size.y > 1 && yRotation is 0 or 90;

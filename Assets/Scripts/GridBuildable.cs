@@ -7,7 +7,7 @@ public abstract class GridBuildable : MonoBehaviour
 
     public Vector2Int GetPivotPoint()
     {
-        return TableGrid.GetRectPivotPoint(Rect, transform.eulerAngles.y);
+        return Vector2Int.RoundToInt(Rect.position) + TableGrid.GetRectOffset(Rect.size, transform.eulerAngles.y);
     }
 
     private void OnDrawGizmos()
@@ -26,6 +26,6 @@ public abstract class GridBuildable : MonoBehaviour
     [ContextMenu("Update Rect")]
     public void UpdateRect(Vector2 size)
     {
-        Rect = TableGrid.CreateRotatedRect(transform.position, size, transform.eulerAngles.y);
+        Rect = TableGrid.CreateBuildingRect(transform.position, size, transform.eulerAngles.y);
     }
 }
