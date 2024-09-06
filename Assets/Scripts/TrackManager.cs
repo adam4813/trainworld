@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class TrackManager : MonoBehaviour, ISaveable
 {
@@ -21,6 +23,19 @@ public class TrackManager : MonoBehaviour, ISaveable
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void Start()
+    {
+        // Loop over all children of the train layer container and add them to the grid cells list.
+        for (var i = 0; i < trainEngineContainer.childCount; i++)
+        {
+            var child = trainEngineContainer.GetChild(i);
+            if (child.TryGetComponent<TrainEngine>(out var trainEngine))
+            {
+                trainEngines.Add(trainEngine);
+            }
         }
     }
 

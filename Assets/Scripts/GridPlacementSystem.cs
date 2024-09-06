@@ -39,12 +39,14 @@ public class GridPlacementSystem : MonoBehaviour, ISaveable
         for (var i = 0; i < gridLayerContainer.childCount; i++)
         {
             var child = gridLayerContainer.GetChild(i);
+            if (!child.TryGetComponent<GridBuildable>(out var gridBuildable)) continue;
+            
             var gridCell = new TableGrid.GridCell
             {
-                building = child.GetComponent<GridBuildable>()
+                building = gridBuildable
             };
             tableGrid.AddGridCell(gridCell);
-            OnBuildingPlaced?.Invoke(gridCell.building);
+            OnBuildingPlaced?.Invoke(gridBuildable);
         }
     }
     
