@@ -663,6 +663,8 @@ MonoBehaviour:
     - {fileID: 8126111114748745102}
     - {fileID: 3179103335520288676}
     - {fileID: 7423326944108402247}
+    inputGridCoord: {x: 0, y: 0}
+    outputGridCoord: {x: 2, y: 2}
   compareDistance: 0.5
 --- !u!1 &5673469009659804128
 GameObject:

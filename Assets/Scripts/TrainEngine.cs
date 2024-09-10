@@ -28,6 +28,21 @@ public class TrainEngine : MonoBehaviour
     }
 
     public TrainCargo Cargo => cargo;
+    public Direction Direction
+    {
+        get
+        {
+            var forward = transform.forward;
+            if (Mathf.Abs(forward.x) > Mathf.Abs(forward.z))
+            {
+                return forward.x > 0 ? Direction.Right : Direction.Left;
+            }
+
+            return forward.z > 0 ? Direction.Forward : Direction.Backwards;
+        }
+    }
+
+    public TrainTrack.Path CurrentPath { get; set; }
 
     public void SetPath(List<Transform> path)
     {
@@ -111,6 +126,15 @@ public class TrainEngine : MonoBehaviour
         {
             Gizmos.color = Color.blue;
             Gizmos.DrawSphere(currentTarget.Position, 0.2f);
+        }
+        
+        if (CurrentPath != null)
+        {
+            foreach (var path in CurrentPath.nodes)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawSphere(path.position, 0.2f);
+            }
         }
     }
 

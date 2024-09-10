@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
+
 
 public class TrackManager : MonoBehaviour, ISaveable
 {
@@ -90,6 +90,7 @@ public class TrackManager : MonoBehaviour, ISaveable
 
         trainEngine.transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
         trainEngine.transform.localPosition = new Vector3(position.x, -1.25f, position.z) + trainEngine.EngineOffset();
+        trainEngine.CurrentPath = GetPath(Vector2Int.RoundToInt(TableGrid.GridPosToGridCoord(position)));
     }
 
     private void OnBuildingPlaced(GridBuildable buildable)
@@ -140,7 +141,31 @@ public class TrackManager : MonoBehaviour, ISaveable
             );
 
             engine.SetPath(path);
+
+            var nextPath = GetNextPath(engine.Direction, engine.CurrentPath.outputGridCoord);
+            if (nextPath == null) continue;
+
+            engine.CurrentPath = nextPath;
         }
+    }
+
+    public TrainTrack.Path GetPath(Vector2Int gridCoord)
+    {
+        var track = trainTracks.FirstOrDefault(trackCell => trackCell.GetPath(gridCoord) != null);
+        return track?.GetPath(gridCoord);
+    }
+
+    public TrainTrack.Path GetNextPath(Direction trainDirection, Vector2Int startingGridCoord)
+    {
+        var outputDirectionVector = trainDirection switch
+        {
+            Direction.Forward => Vector2Int.up,
+            Direction.Right => Vector2Int.right,
+            Direction.Backwards => Vector2Int.down,
+            Direction.Left => Vector2Int.left,
+            _ => Vector2Int.zero
+        };
+        return GetPath(startingGridCoord + outputDirectionVector);
     }
 
     public void PopulateSaveData(SaveData saveData)

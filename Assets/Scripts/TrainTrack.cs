@@ -9,6 +9,8 @@ public class TrainTrack : GridBuildable
     public class Path
     {
         public List<Transform> nodes;
+        public Vector2Int inputGridCoord;
+        public Vector2Int outputGridCoord;
     }
 
     [SerializeField] private TrackScriptableObject trackScriptableObject;
@@ -31,5 +33,38 @@ public class TrainTrack : GridBuildable
     public override Vector2Int GetSize()
     {
         return new Vector2Int((int)trackScriptableObject.trackSize.x, (int)trackScriptableObject.trackSize.y);
+    }
+
+    public Path GetPath(Vector2Int inputGridCoord)
+    {
+        // TODO: Update when split paths are implemented and output needs to be considered
+        return paths.FirstOrDefault(path => Rect.position + path.inputGridCoord == inputGridCoord);
+    }
+
+    private Vector2Int LocalGridToWorldGridCoord(Vector2Int localGridCoord)
+    {
+        var rotatedLocalGridCoord = transform.rotation.eulerAngles.y switch
+        {
+            // (y, -x)
+            90 or -270 => new Vector2Int(localGridCoord.y, 0 - localGridCoord.x),
+            // (y,x)
+            180 or -180 => new Vector2Int(localGridCoord.y, localGridCoord.x),
+            // (-y, x)
+            270 or -90 => new Vector2Int(0 - localGridCoord.y, localGridCoord.x),
+            _ => localGridCoord
+        };
+
+        return Vector2Int.RoundToInt(Rect.position + rotatedLocalGridCoord);
+    }
+
+    private void OnDrawGizmos()
+    {
+        foreach (var path in paths)
+        {
+            var start = LocalGridToWorldGridCoord(path.inputGridCoord);
+            var end = LocalGridToWorldGridCoord(path.outputGridCoord);
+            Debug.DrawLine(new Vector3(start.x, transform.position.y + 0.1f, start.y),
+                new Vector3(end.x, transform.position.y + 0.1f, end.y), Color.magenta);
+        }
     }
 }
