@@ -1,25 +1,19 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Splines;
 
+[RequireComponent(typeof(SplineAnimate))]
 public class TrainEngine : MonoBehaviour
 {
-    private class PathNode
-    {
-        public Vector3 Position;
-    }
-
     [SerializeField] private float speed = 1;
-    [SerializeField] private float engineSize = 1;
     [SerializeField] private TrainEngineScriptableObject trainEngineScriptableObject;
-    public TrainEngineScriptableObject TrainEngineScriptableObject => trainEngineScriptableObject;
-
-    private float distanceToTarget;
-    private readonly Queue<PathNode> currentPath = new();
-    private PathNode currentTarget;
     [SerializeField] private TrainStation dockedStation;
     [SerializeField] private TrainCargo cargo;
-    public bool IsMoving => currentPath.Count > 0 || dockedStation != null;
+    [SerializeField] private SplineAnimate splineAnimate;
+    public bool IsMoving => splineAnimate.IsPlaying;
+    public TrainCargo Cargo => cargo;
+    public TrainEngineScriptableObject TrainEngineScriptableObject => trainEngineScriptableObject;
 
     public float Speed
     {
@@ -27,35 +21,20 @@ public class TrainEngine : MonoBehaviour
         set => speed = value;
     }
 
-    public TrainCargo Cargo => cargo;
-    public Direction Direction
+    private void Awake()
     {
-        get
-        {
-            var forward = transform.forward;
-            if (Mathf.Abs(forward.x) > Mathf.Abs(forward.z))
-            {
-                return forward.x > 0 ? Direction.Right : Direction.Left;
-            }
-
-            return forward.z > 0 ? Direction.Forward : Direction.Backwards;
-        }
+        splineAnimate = GetComponent<SplineAnimate>();
+        splineAnimate.MaxSpeed = Speed;
     }
 
-    public TrainTrack.Path CurrentPath { get; set; }
-
-    public void SetPath(List<Transform> path)
+    public void SetSpline(SplineContainer spline)
     {
-        foreach (var node in path)
+        splineAnimate.Container = spline;
+        splineAnimate.enabled = splineAnimate.Container.Spline.Knots.Any();
+        if (!dockedStation && splineAnimate.enabled)
         {
-            var position = new Vector3(node.position.x, transform.position.y, node.position.z);
-            currentPath.Enqueue(new PathNode
-            {
-                Position = position,
-            });
+            splineAnimate.Restart(true);
         }
-
-        UpdateCurrentTarget();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -70,79 +49,7 @@ public class TrainEngine : MonoBehaviour
 
     public Vector3 EngineOffset()
     {
-        return transform.forward * engineSize / 4f;
-    }
-
-    private void UpdateCurrentTarget()
-    {
-        if (distanceToTarget > 0) return;
-
-        var targetOffset = EngineOffset();
-
-        if (currentTarget != null)
-        {
-            transform.position = currentTarget.Position + targetOffset;
-        }
-
-        do
-        {
-            currentTarget = currentPath.Count > 0 ? currentPath.Dequeue() : null;
-        } while (currentTarget != null &&
-                 Vector3.Dot(transform.forward, (currentTarget.Position + targetOffset) - transform.position) < -.75f);
-
-        if (currentTarget != null)
-        {
-            transform.LookAt(currentTarget.Position + targetOffset);
-            distanceToTarget = Vector3.Distance(transform.position - EngineOffset(), currentTarget.Position);
-        }
-        else
-        {
-            distanceToTarget = 0;
-        }
-    }
-
-    private void Update()
-    {
-        UpdateCurrentTarget();
-
-        if (currentTarget == null) return;
-
-        var distanceTravelled = Speed * Time.deltaTime;
-        distanceToTarget -= distanceTravelled;
-        transform.position = Vector3.MoveTowards(transform.position,
-            currentTarget.Position + EngineOffset(),
-            Mathf.Clamp(distanceTravelled, 0f, distanceToTarget * 2f));
-    }
-
-    private void OnDrawGizmos()
-    {
-        foreach (var path in currentPath)
-        {
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawSphere(path.Position, 0.2f);
-        }
-
-        if (currentTarget != null)
-        {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawSphere(currentTarget.Position, 0.2f);
-        }
-        
-        if (CurrentPath != null)
-        {
-            foreach (var path in CurrentPath.nodes)
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawSphere(path.position, 0.2f);
-            }
-        }
-    }
-
-    public void ClearPath()
-    {
-        distanceToTarget = 0;
-        currentPath.Clear();
-        currentTarget = null;
+        return transform.forward * .5f;
     }
 
     public TrainCargo UnloadCargo()
@@ -159,6 +66,8 @@ public class TrainEngine : MonoBehaviour
 
     private IEnumerator DockAtStation(TrainStation trainStation)
     {
+        splineAnimate.Pause();
+
         while (trainStation.DockedTrainEngine && trainStation.DockedTrainEngine != this)
         {
             yield return new WaitForSeconds(1f);
@@ -172,5 +81,15 @@ public class TrainEngine : MonoBehaviour
     {
         trainStation.OnTrainDeparted(this);
         dockedStation = null;
+
+        if (splineAnimate.Container.Spline.Knots.Any())
+        {
+            splineAnimate.Play();
+        }
+    }
+
+    public void ClearSpline()
+    {
+        splineAnimate.Container = null;
     }
 }

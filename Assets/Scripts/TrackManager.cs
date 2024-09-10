@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Splines;
 using Random = UnityEngine.Random;
-
 
 public class TrackManager : MonoBehaviour, ISaveable
 {
@@ -73,7 +73,7 @@ public class TrackManager : MonoBehaviour, ISaveable
     private void OnTrainEnginePickedUp(TrainEngine trainEngine)
     {
         trainEngine.gameObject.SetActive(false);
-        trainEngine.ClearPath();
+        trainEngine.ClearSpline();
     }
 
     private void OnTrainEnginePlaced(TrainEngine trainEngine, Vector3 position, float yRotation)
@@ -89,8 +89,8 @@ public class TrackManager : MonoBehaviour, ISaveable
         }
 
         trainEngine.transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
-        trainEngine.transform.localPosition = new Vector3(position.x, -1.25f, position.z) + trainEngine.EngineOffset();
-        trainEngine.CurrentPath = GetPath(Vector2Int.RoundToInt(TableGrid.GridPosToGridCoord(position)));
+        trainEngine.transform.localPosition = new Vector3(position.x, -1.25f, position.z);
+        trainEngine.SetSpline(GetTrackSpline(Vector2Int.RoundToInt(TableGrid.GridPosToGridCoord(position))));
     }
 
     private void OnBuildingPlaced(GridBuildable buildable)
@@ -120,52 +120,24 @@ public class TrackManager : MonoBehaviour, ISaveable
         {
             if (engine.IsMoving || !engine.gameObject.activeSelf) continue;
 
-            var enginePosition = engine.transform.position;
-            var engineGridCoord = TableGrid.GridPosToGridCoord(enginePosition);
-            var currentTrack = trainTracks.FirstOrDefault(trackCell => trackCell.Rect.Contains(engineGridCoord));
+            var nextEnginePosition = engine.transform.position + engine.EngineOffset();
+            var spline = GetTrackSpline(Vector2Int.RoundToInt(TableGrid.GridPosToGridCoord(nextEnginePosition)));
 
-            var nextEnginePosition = enginePosition + engine.EngineOffset() * 2f;
-            var nextEngineGridCoord = TableGrid.GridPosToGridCoord(nextEnginePosition);
-            var nextTrack = trainTracks.FirstOrDefault(trackCell => trackCell.Rect.Contains(nextEngineGridCoord));
-
-            if (!currentTrack || !nextTrack || currentTrack == nextTrack) continue;
-
-            var path = nextTrack.GetClosestPath(nextEnginePosition);
-            if (path.Count < 2) continue;
-
-            path.Sort((pathA, pathB) =>
-                Vector3.Distance(pathA.position, nextEnginePosition) >
-                Vector3.Distance(pathB.position, nextEnginePosition)
-                    ? 1
-                    : -1
-            );
-
-            engine.SetPath(path);
-
-            var nextPath = GetNextPath(engine.Direction, engine.CurrentPath.outputGridCoord);
-            if (nextPath == null) continue;
-
-            engine.CurrentPath = nextPath;
+            if (!spline)
+            {
+                engine.ClearSpline();
+            }
+            else
+            {
+                engine.SetSpline(spline);
+            }
         }
     }
 
-    public TrainTrack.Path GetPath(Vector2Int gridCoord)
+    private SplineContainer GetTrackSpline(Vector2Int gridCoord)
     {
-        var track = trainTracks.FirstOrDefault(trackCell => trackCell.GetPath(gridCoord) != null);
-        return track?.GetPath(gridCoord);
-    }
-
-    public TrainTrack.Path GetNextPath(Direction trainDirection, Vector2Int startingGridCoord)
-    {
-        var outputDirectionVector = trainDirection switch
-        {
-            Direction.Forward => Vector2Int.up,
-            Direction.Right => Vector2Int.right,
-            Direction.Backwards => Vector2Int.down,
-            Direction.Left => Vector2Int.left,
-            _ => Vector2Int.zero
-        };
-        return GetPath(startingGridCoord + outputDirectionVector);
+        var track = trainTracks.FirstOrDefault(trackCell => trackCell.Rect.Contains(gridCoord));
+        return track?.GetComponent<SplineContainer>();
     }
 
     public void PopulateSaveData(SaveData saveData)
