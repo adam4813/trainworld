@@ -90,7 +90,7 @@ public class TrackManager : MonoBehaviour, ISaveable
 
         trainEngine.transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
         trainEngine.transform.localPosition = new Vector3(position.x, -1.25f, position.z);
-        trainEngine.SetSpline(GetTrackSpline(Vector2Int.RoundToInt(TableGrid.GridPosToGridCoord(position))));
+        SetTrainEngineTrack(trainEngine, position);
     }
 
     private void OnBuildingPlaced(GridBuildable buildable)
@@ -116,28 +116,32 @@ public class TrackManager : MonoBehaviour, ISaveable
 
     private void Update()
     {
-        foreach (var engine in trainEngines)
+        foreach (var trainEngine in trainEngines)
         {
-            if (engine.IsMoving || !engine.gameObject.activeSelf) continue;
+            if (trainEngine.IsMoving || !trainEngine.gameObject.activeSelf) continue;
 
-            var nextEnginePosition = engine.transform.position + engine.EngineOffset();
-            var spline = GetTrackSpline(Vector2Int.RoundToInt(TableGrid.GridPosToGridCoord(nextEnginePosition)));
-
-            if (!spline)
-            {
-                engine.ClearSpline();
-            }
-            else
-            {
-                engine.SetSpline(spline);
-            }
+            var nextEnginePosition = trainEngine.transform.position + trainEngine.EngineOffset();
+            SetTrainEngineTrack(trainEngine, nextEnginePosition);
         }
     }
 
-    private SplineContainer GetTrackSpline(Vector2Int gridCoord)
+    private void SetTrainEngineTrack(TrainEngine trainEngine, Vector3 nextEnginePosition)
     {
-        var track = trainTracks.FirstOrDefault(trackCell => trackCell.Rect.Contains(gridCoord));
-        return track?.GetComponent<SplineContainer>();
+        var track = GetTrack(Vector2Int.RoundToInt(TableGrid.GridPosToGridCoord(nextEnginePosition)));
+
+        if (!track)
+        {
+            trainEngine.ClearSpline();
+        }
+        else
+        {
+            trainEngine.SetSplinePath(track.GetSpline(trainEngine.transform.position));
+        }
+    }
+
+    private TrainTrack GetTrack(Vector2Int gridCoord)
+    {
+        return trainTracks.FirstOrDefault(trackCell => trackCell.Rect.Contains(gridCoord));
     }
 
     public void PopulateSaveData(SaveData saveData)

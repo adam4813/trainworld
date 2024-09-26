@@ -27,10 +27,16 @@ public class TrainEngine : MonoBehaviour
         splineAnimate.MaxSpeed = Speed;
     }
 
-    public void SetSpline(SplineContainer spline)
+    public void SetSplinePath(TrainTrack.TrackSplinePath splinePath)
     {
-        splineAnimate.Container = spline;
+        splineAnimate.Container = splinePath.SplineContainer;
         splineAnimate.enabled = splineAnimate.Container.Spline.Knots.Any();
+        
+        if (splinePath.IsReversed)
+        {
+            splineAnimate.Container.ReverseFlow(0);
+        }
+        
         if (!dockedStation && splineAnimate.enabled)
         {
             splineAnimate.Restart(true);

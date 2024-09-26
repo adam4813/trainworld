@@ -576,15 +576,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6a979c64827475c86ce0541258d5c47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  splineContainer: {fileID: -419845345725762081}
   trackScriptableObject: {fileID: 11400000, guid: 9da5348d1c0a472438e0bffc10f6fcb7,
     type: 2}
-  paths:
-  - nodes:
-    - {fileID: 5043633797324559884}
-    - {fileID: 4812774307874138670}
-    - {fileID: 4583730437213244982}
-    inputGridCoord: {x: 0, y: 0}
-    outputGridCoord: {x: 0, y: 1}
   compareDistance: 0.5
 --- !u!114 &-419845345725762081
 MonoBehaviour:
