@@ -182,9 +182,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sprite: {fileID: 0}
   image: {fileID: 2669084809884808515}
-  buildingScriptableObject: {fileID: 0}
-  trackScriptableObject: {fileID: 0}
-  trainEngineScriptableObject: {fileID: 0}
+  prefab: {fileID: 0}
+  enginePrefab: {fileID: 0}
 --- !u!82 &6877072484541076127
 AudioSource:
   m_ObjectHideFlags: 0

@@ -88,7 +88,7 @@ public class TrainEngine : MonoBehaviour
         trainStation.OnTrainDeparted(this);
         dockedStation = null;
 
-        if (splineAnimate.Container.Spline.Knots.Any())
+        if (splineAnimate.Container?.Spline?.Knots.Any() != null)
         {
             splineAnimate.Play();
         }

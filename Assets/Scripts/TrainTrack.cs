@@ -10,10 +10,9 @@ public class TrainTrack : GridBuildable
         public SplineContainer SplineContainer;
         public bool IsReversed;
     }
+    
     [SerializeField] private SplineContainer splineContainer;
     [SerializeField] private TrackScriptableObject trackScriptableObject;
-    [SerializeField] private float compareDistance = 1f;
-
     public TrackScriptableObject TrackScriptableObject => trackScriptableObject;
 
     public override Vector2Int GetSize()

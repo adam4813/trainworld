@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -8,17 +7,18 @@ public class TrainStation : GridBuildable
 {
     [SerializeField] private List<CargoScriptableObject> availableCargo;
     [SerializeField] private Vector2Int stationSize;
-    [SerializeField] private TrainTrack connectedTrack;
     [SerializeField] private TrainCargo inCargo;
     [SerializeField] private TrainCargo outCargo;
     [SerializeField] private TrainEngine dockedTrainEngine;
 
     public TrainEngine DockedTrainEngine => dockedTrainEngine;
+    public TrainTrack Track { get; private set; }
 
     private void Awake()
     {
         UpdateRect(stationSize);
         StartCoroutine(GetNewCargo());
+        Track = GetComponentInChildren<TrainTrack>();
     }
 
     public void OnTrainDocked(TrainEngine trainEngine)
@@ -70,7 +70,7 @@ public class TrainStation : GridBuildable
     {
         yield return new WaitForSeconds(5f);
         var nextCargo = availableCargo[Random.Range(0, availableCargo.Count)];
-        var destination = TrackManager.Instance.GetNextStation(this, connectedTrack);
+        var destination = TrackManager.Instance.GetNextStation(this, Track);
         outCargo = new TrainCargo { CargoScriptableObject = nextCargo, Destination = destination };
     }
 

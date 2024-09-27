@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Splines;
-using Random = UnityEngine.Random;
 
 public class TrackManager : MonoBehaviour, ISaveable
 {
@@ -102,6 +100,7 @@ public class TrackManager : MonoBehaviour, ISaveable
         }
         else if (buildable.TryGetComponent<TrainStation>(out var trainStation))
         {
+            trainStation.UpdateRect(trainStation.GetSize());
             trainStations.Add(trainStation);
         }
     }
@@ -141,7 +140,8 @@ public class TrackManager : MonoBehaviour, ISaveable
 
     private TrainTrack GetTrack(Vector2Int gridCoord)
     {
-        return trainTracks.FirstOrDefault(trackCell => trackCell.Rect.Contains(gridCoord));
+        return trainStations.Find(stationCell => stationCell.Rect.Contains(gridCoord))?.Track ??
+               trainTracks.FirstOrDefault(trackCell => trackCell.Rect.Contains(gridCoord));
     }
 
     public void PopulateSaveData(SaveData saveData)
@@ -191,7 +191,8 @@ public class TrackManager : MonoBehaviour, ISaveable
 
     public TrainStation GetNextStation(TrainStation currentStation, TrainTrack connectedTrack)
     {
+        return currentStation;
         // Todo: Implement this method
-        return trainStations[Random.Range(0, trainStations.Count)];
+        //return trainStations[Random.Range(0, trainStations.Count)];
     }
 }
