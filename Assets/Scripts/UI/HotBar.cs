@@ -12,7 +12,7 @@ public class HotBar : MonoBehaviour
 
     private void Awake()
     {
-        // Add child game object with compoent HotBarButton to the hotBarButtons list
+        // Add child game object with component HotBarButton to the hotBarButtons list
         foreach (Transform child in transform)
         {
             if (!child.TryGetComponent<HotBarButton>(out var hotBarButton)) continue;

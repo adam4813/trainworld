@@ -12,7 +12,23 @@ public class TableGrid : MonoBehaviour
     }
 
     [SerializeField] private Transform gridLayerContainer;
+    [SerializeField] private GameObject gridOverlay;
     [SerializeField] private List<GridCell> gridCells;
+    
+    private void OnEnable()
+    {
+        HotBar.OnHotBarButtonClicked += OnHotBarButtonClicked;
+    }
+
+    private void OnDisable()
+    {
+        HotBar.OnHotBarButtonClicked -= OnHotBarButtonClicked;
+    }
+
+    private void OnHotBarButtonClicked(HotBarButton button)
+    {
+        gridOverlay.SetActive(button);
+    }
 
     public void ClearGridCell(GridCell gridCell)
     {

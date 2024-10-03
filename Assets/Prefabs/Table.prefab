@@ -465,6 +465,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridLayerContainer: {fileID: 7338562607164533854}
+  gridOverlay: {fileID: 1707747510677274527}
   gridCells: []
 --- !u!65 &5654263791467769483
 BoxCollider:

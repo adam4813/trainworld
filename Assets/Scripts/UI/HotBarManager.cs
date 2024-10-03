@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class HotBarManager : MonoBehaviour
@@ -26,11 +27,13 @@ public class HotBarManager : MonoBehaviour
 
         deleteButton.GetComponent<Button>().onClick.AddListener(() =>
         {
-            if (activeHotBarIndex == -1) return;
-            hotBars[activeHotBarIndex].gameObject.SetActive(false);
-            activeHotBarIndex = -1;
-            HotBar.FireHotBarButtonClicked(deleteButton);
+            if (activeHotBarIndex >= 0)
+            {
+                hotBars[activeHotBarIndex].gameObject.SetActive(false);
+                activeHotBarIndex = -1;
+            }
             isDeleteButtonSelected = true;
+            HotBar.FireHotBarButtonClicked(deleteButton);
             deleteButton.GetComponent<AudioSource>().Play();
         });
     }
@@ -59,5 +62,25 @@ public class HotBarManager : MonoBehaviour
                 isDeleteButtonSelected = false;
             });
         }
+    }
+
+    private void Update()
+    {
+        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            ClearSelectedButton();
+        }
+    }
+
+    private void ClearSelectedButton()
+    {
+        if (activeHotBarIndex >= 0)
+        {
+            hotBars[activeHotBarIndex].gameObject.SetActive(false);
+            activeHotBarIndex = -1;
+        }
+
+        isDeleteButtonSelected = false;
+        HotBar.FireHotBarButtonClicked(null);
     }
 }
