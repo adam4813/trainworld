@@ -74,14 +74,8 @@ public class TrainStation : GridBuildable
         outCargo = new TrainCargo { CargoScriptableObject = nextCargo, Destination = destination };
     }
 
-    public override Vector2Int GetSize()
+    protected override Vector2Int GetScriptableObjectSize()
     {
-        // If it is not a square, return the size rotated, if necessary
-        if (!Mathf.Approximately(stationSize.x, stationSize.y) && transform.rotation.eulerAngles.y is 90 or -90 or 270 or -270)
-        {
-            return new Vector2Int(stationSize.y, stationSize.x);
-        }
-
-        return new Vector2Int(stationSize.x, stationSize.y);
+        return stationSize;
     }
 }

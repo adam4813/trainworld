@@ -15,9 +15,9 @@ public class TrainTrack : GridBuildable
     [SerializeField] private TrackScriptableObject trackScriptableObject;
     public TrackScriptableObject TrackScriptableObject => trackScriptableObject;
 
-    public override Vector2Int GetSize()
+    protected override Vector2Int GetScriptableObjectSize()
     {
-        return new Vector2Int((int)trackScriptableObject.trackSize.x, (int)trackScriptableObject.trackSize.y);
+        return Vector2Int.CeilToInt(trackScriptableObject.trackSize);
     }
 
     public TrackSplinePath GetSpline(Vector3 startingPosition)

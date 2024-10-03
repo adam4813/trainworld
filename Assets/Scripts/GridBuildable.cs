@@ -3,7 +3,7 @@
 public abstract class GridBuildable : MonoBehaviour
 {
     public Rect Rect { get; private set; }
-    public abstract Vector2Int GetSize();
+    protected abstract Vector2Int GetScriptableObjectSize();
 
     public Vector2Int GetPivotPoint()
     {
@@ -27,5 +27,14 @@ public abstract class GridBuildable : MonoBehaviour
     public void UpdateRect(Vector2 size)
     {
         Rect = GridPlacementSystem.CreateBuildingRect(transform.position, size, transform.eulerAngles.y);
+    }
+
+    public Vector2Int GetSize()
+    {
+        var size = GetScriptableObjectSize();
+        // If it is not a square, return the size rotated, if necessary
+        return !Mathf.Approximately(size.x, size.y) && transform.rotation.eulerAngles.y is 90 or -90 or 270 or -270
+            ? new Vector2Int(size.y, size.x)
+            : size;
     }
 }

@@ -5,9 +5,8 @@ public class Building : GridBuildable
     [SerializeField] private BuildingScriptableObject buildingScriptableObject;
     public BuildingScriptableObject BuildingScriptableObject => buildingScriptableObject;
 
-    public override Vector2Int GetSize()
+    protected override Vector2Int GetScriptableObjectSize()
     {
-        return new Vector2Int((int)buildingScriptableObject.buildingSize.x,
-            (int)buildingScriptableObject.buildingSize.y);
+        return Vector2Int.CeilToInt(buildingScriptableObject.buildingSize);
     }
 }

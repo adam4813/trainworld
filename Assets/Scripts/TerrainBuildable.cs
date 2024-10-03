@@ -5,8 +5,8 @@ public class TerrainBuildable : GridBuildable
     [SerializeField] private TerrainScriptableObject terrainScriptableObject;
     public TerrainScriptableObject TerrainScriptableObject => terrainScriptableObject;
 
-    public override Vector2Int GetSize()
+    protected override Vector2Int GetScriptableObjectSize()
     {
-        return new Vector2Int((int)terrainScriptableObject.terrainSize.x, (int)terrainScriptableObject.terrainSize.y);
+        return Vector2Int.CeilToInt(terrainScriptableObject.terrainSize);
     }
 }
