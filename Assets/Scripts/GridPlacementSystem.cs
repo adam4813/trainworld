@@ -245,7 +245,7 @@ public class GridPlacementSystem : MonoBehaviour, ISaveable
         {
             // Local position used to render relative to the grid layer container.
             var gridCoord = TableGrid.GridPosToGridCoord(tableGrid.WorldToGridPos(position));
-            var gridPos = TableGrid.GridCoordToGridCoordPos(gridCoord);
+            var gridPos = TableGrid.GridCoordToGridCoordPos(gridCoord, Vector2.one);
             trainEngineDrag.transform.localPosition = gridPos;
             trainEngineDrag.transform.rotation = Quaternion.Euler(0,
                 gridCell.building.transform.eulerAngles.y +
@@ -274,7 +274,7 @@ public class GridPlacementSystem : MonoBehaviour, ISaveable
         var yRotation = gridCell.building.transform.eulerAngles.y +
                         (trainTrack.TrackScriptableObject.trackType == TrackType.Curve ? 45 : 0);
         var gridCoord = TableGrid.GridPosToGridCoord(tableGrid.WorldToGridPos(position));
-        var gridPos = TableGrid.GridCoordToGridCoordPos(gridCoord);
+        var gridPos = TableGrid.GridCoordToGridCoordPos(gridCoord, Vector2.one);
         OnEnginePlaced?.Invoke(trainEngine, gridPos, yRotation);
     }
 
@@ -303,11 +303,12 @@ public class GridPlacementSystem : MonoBehaviour, ISaveable
 
     private void SetBuildingTransform(GridBuildable building, Vector3 position, float yPos)
     {
+        building.transform.rotation = Quaternion.Euler(0, currentRotation, 0);
         var worldPivotPoint = tableGrid.GetPivotPoint(position, building.GetSize(), currentRotation);
         worldPivotPoint.y = yPos;
         building.transform.localPosition =
             worldPivotPoint; // Local position used to render relative to the grid layer container.
-        building.transform.rotation = Quaternion.Euler(0, currentRotation, 0);
+        building.UpdateRect(building.GetSize());
     }
 
     private void PlaceBuilding(Vector3 position, GridBuildable prefab, float yPos, float yRotation)

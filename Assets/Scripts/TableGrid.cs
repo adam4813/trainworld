@@ -14,7 +14,7 @@ public class TableGrid : MonoBehaviour
     [SerializeField] private Transform gridLayerContainer;
     [SerializeField] private GameObject gridOverlay;
     [SerializeField] private List<GridCell> gridCells;
-    
+
     private void OnEnable()
     {
         HotBar.OnHotBarButtonClicked += OnHotBarButtonClicked;
@@ -44,7 +44,8 @@ public class TableGrid : MonoBehaviour
 
     public Vector3 GetPivotPoint(Vector3 position, Vector2 size, float yRotation)
     {
-        return GridCoordToGridCoordPos(GridPosToGridCoord(WorldToGridPos(position)) + GetRectOffset(size, yRotation));
+        return GridCoordToGridCoordPos(GridPosToGridCoord(WorldToGridPos(position)) + GetRectOffset(size, yRotation),
+            size);
     }
 
     public static Vector2Int GetRectOffset(Vector2 size, float yRotation)
@@ -71,8 +72,15 @@ public class TableGrid : MonoBehaviour
     }
 
     // Convert the grid coordinates to grid local position, within the grid layer container.
-    public static Vector3 GridCoordToGridCoordPos(Vector2 gridCoord)
+    public static Vector3 GridCoordToGridCoordPos(Vector2 gridCoord, Vector2 size)
     {
+        // Only apply the offset if the size is not equal on both axes.
+        if (!Mathf.Approximately(size.x, size.y))
+        {
+            return new Vector3(gridCoord.x + (size.x % 2 == 0 ? 0 : 0.5f), 0,
+                gridCoord.y + (size.y % 2 == 0 ? 0 : 0.5f));
+        }
+
         return new Vector3(gridCoord.x + 0.5f, 0, gridCoord.y + 0.5f); // Ignore the y-axis.
     }
 
